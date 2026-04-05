@@ -1,6 +1,6 @@
 let URL_SERV = localStorage.getItem('looi_url') || "https://looi-robot.loca.lt";
 let ocupada = false;
-let textoCapturado = "";
+let textoVoz = "";
 
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
@@ -11,48 +11,41 @@ function verificarSenha() {
 }
 
 function iniciarHardware() {
-    // Adicionado o playsinline para funcionar vídeo no celular
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true })
         .then(s => { document.getElementById('video').srcObject = s; });
-    roboFalar("LOOI iniciada no modo mobile.");
+    roboFalar("Sistema online.");
 }
 
-function toggleFullScreen() {
+function toggleFS() {
     if (!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
 }
 
-// --- RECONHECIMENTO DE VOZ ---
+// VOZ
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
 const ouvinte = Rec ? new Rec() : null;
 
 if (ouvinte) {
     ouvinte.lang = 'pt-BR';
-    ouvinte.onstart = () => { document.body.style.boxShadow = "inset 0 0 50px #00f7ff"; };
-    
     ouvinte.onresult = (e) => {
-        textoCapturado = e.results[0][0].transcript;
-        document.getElementById('inputTexto').value = textoCapturado;
-        
-        // MOSTRA O BOTÃO DE CONFIRMAR NO MEIO DA TELA
-        document.getElementById('container-confirmar').style.display = "block";
+        textoVoz = e.results[0][0].transcript;
+        document.getElementById('inputTexto').value = textoVoz;
+        // APARECE O BOTÃO DE ENVIAR
+        document.getElementById('area-confirmacao').style.display = "block";
     };
-
-    ouvinte.onend = () => { document.body.style.boxShadow = "none"; };
 }
 
 function ativarVoz() {
     if (ouvinte && !ocupada) {
-        textoCapturado = "";
+        textoVoz = "";
         ouvinte.start();
     }
 }
 
 function confirmarEnvio() {
-    if (textoCapturado !== "") {
-        comunicar(textoCapturado);
-        document.getElementById('container-confirmar').style.display = "none";
-        textoCapturado = "";
+    if (textoVoz !== "") {
+        comunicar(textoVoz);
+        document.getElementById('area-confirmacao').style.display = "none";
     }
 }
 
@@ -69,7 +62,7 @@ function comunicar(texto) {
     if (!texto || ocupada) return;
     const canv = document.getElementById('canvas');
     const vid = document.getElementById('video');
-    canv.width = 300; canv.height = 225; // Imagem menor para o celular carregar rápido
+    canv.width = 300; canv.height = 225;
     canv.getContext('2d').drawImage(vid, 0, 0, 300, 225);
 
     canv.toBlob(blob => {
@@ -83,19 +76,4 @@ function comunicar(texto) {
             roboFalar(d.resposta);
         });
     }, 'image/jpeg');
-}
-
-document.getElementById('btnEnviar').onclick = () => {
-    comunicar(document.getElementById('inputTexto').value);
-    document.getElementById('inputTexto').value = "";
-};
-
-function toggleMenu() {
-    const m = document.getElementById('menu-config');
-    m.style.display = m.style.display === "block" ? "none" : "block";
-}
-function salvarConfig() {
-    URL_SERV = document.getElementById('configUrl').value;
-    localStorage.setItem('looi_url', URL_SERV);
-    toggleMenu();
 }
