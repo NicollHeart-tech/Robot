@@ -3,50 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS - Protegido</title>
+    <title>LOOI OS - LIVE VLM</title>
     <link rel="stylesheet" href="estilo.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
     <div id="tela-login">
         <div class="login-box">
-            <h1 class="titulo-seguranca">SISTEMA BLOQUEADO</h1>
-            <p style="color:#aaa;">Insira a chave de acesso</p>
-            <input type="password" id="senhaInput" placeholder="••••••"
-                   onkeydown="if(event.key==='Enter') verificarSenha()">
-            <button onclick="verificarSenha()" id="btnAcessar">DESBLOQUEAR</button>
-            <p id="erroMsg" style="display:none; color:#ff3300; margin-top:10px;">⚠ CHAVE INCORRETA!</p>
+            <h1 class="titulo-seguranca">LOOI CORE</h1>
+            <p>CHAVE DE ACESSO REQUERIDA</p>
+            <input type="password" id="senhaInput" placeholder="Digite a senha">
+            <button onclick="verificarSenha()" id="btnAcessar">ENTRAR</button>
+            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">ACESSO NEGADO!</p>
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div id="conteudo-robo" style="display:none; flex-direction:column; align-items:center;">
+    <div id="conteudo-robo" style="display:none;">
+        <button id="exit-fullscreen-btn" onclick="toggleFullScreen()">❌</button>
+        <button id="mic-fullscreen" onclick="ativarVoz()">🎤</button>
+        
+        <div id="container-confirmar">
+             <button id="btn-confirmar-envio" onclick="confirmarEnvio()">ENVIAR PARA IA ✔️</button>
+        </div>
 
-        <!-- Botão fullscreen -->
-        <button id="btnFullscreen" title="Tela cheia">⛶</button>
-
-        <!-- Rosto da LOOI -->
-        <div id="looi-face" class="face neutro">
-            <div class="eyes">
-                <div class="eye left"></div>
-                <div class="eye right"></div>
+        <div class="main-display">
+            <div id="looi-face" class="face neutral">
+                <div class="eyes">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                </div>
+                <div class="mouth-container">
+                    <div class="m-bar b1"></div>
+                    <div class="m-bar b2"></div>
+                    <div class="m-bar b3"></div>
+                </div>
             </div>
-            <div class="mouth" id="looi-mouth"></div>
         </div>
 
-        <!-- HUD de controle -->
         <div class="hud">
-            <input type="text" id="inputTexto" placeholder="Fale comigo...">
-            <button id="btnEnviar" title="Enviar">➤</button>
-            <button id="btnVoz"    title="Microfone">🎤</button>
+            <div class="chat-area">
+                <input type="text" id="inputTexto" placeholder="Conversar...">
+                <button onclick="enviarTexto()">➤</button>
+                <button onclick="ativarVoz()">🎤</button>
+                <button onclick="toggleFullScreen()">📺</button>
+            </div>
         </div>
     </div>
 
-    <!-- Câmera oculta -->
-    <video  id="video"  autoplay playsinline style="display:none"></video>
+    <video id="video" autoplay playsinline style="display:none"></video>
     <canvas id="canvas" style="display:none"></canvas>
-
-    <script src="script.js"></script>
+    
+    <script src="script.js"></script> 
 </body>
 </html>
