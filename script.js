@@ -210,7 +210,7 @@ if (Reconhecimento) {
         console.log("Ouvi:", transcricao);
         input.value = transcricao;
         comunicar(transcricao);
-        setTimeout(() => { input.value = ""; }, 800); // mostra 0.8s e limpa
+        setTimeout(() => { input.value = ""; }, 1500); // mostra 1.5s e limpa
     };
 
     ouvinte.onend = () => {
