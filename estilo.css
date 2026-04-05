@@ -1,72 +1,24 @@
-body {
-    background-color: #000;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    font-family: 'Segoe UI', sans-serif;
-}
+body { background-color: #000; margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
 
-/* TELA DE LOGIN */
-#tela-login {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: #000;
-    display: flex; justify-content: center; align-items: center;
-    z-index: 100;
-}
-.login-box {
-    border: 2px solid #00f7ff;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 0 20px #00f7ff;
-}
+#tela-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 100; }
+.login-box { border: 2px solid #00f7ff; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px #00f7ff; }
 .titulo-seguranca { color: #00f7ff; letter-spacing: 2px; }
-#senhaInput {
-    background: transparent; border: 1px solid #00f7ff;
-    color: white; padding: 10px; text-align: center; border-radius: 5px;
-}
-#btnAcessar {
-    background: #00f7ff; border: none; padding: 10px 20px;
-    margin-top: 10px; border-radius: 5px; cursor: pointer; font-weight: bold;
-}
+#senhaInput { background: transparent; border: 1px solid #00f7ff; color: white; padding: 10px; text-align: center; border-radius: 5px; outline: none; }
+#btnAcessar { background: #00f7ff; border: none; padding: 10px 20px; margin-top: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-/* ROSTO */
-.face {
-    display: flex; flex-direction: column; justify-content: space-around;
-    align-items: center; width: 300px; height: 400px;
-    filter: drop-shadow(0 0 15px #00f7ff);
-    transition: all 0.3s ease;
-}
+.face { display: flex; flex-direction: column; justify-content: space-around; align-items: center; width: 300px; height: 400px; filter: drop-shadow(0 0 15px #00f7ff); transition: all 0.3s ease; }
 .eyes { display: flex; gap: 60px; }
-.eye { 
-    width: 100px; height: 100px; background-color: #00f7ff; 
-    border-radius: 50%; transition: all 0.3s;
-}
-.mouth { 
-    width: 150px; height: 8px; background-color: #00f7ff; 
-    border-radius: 10px; transition: all 0.3s;
-}
+.eye { width: 100px; height: 100px; background-color: #00f7ff; border-radius: 50%; transition: all 0.3s; }
+.mouth { width: 150px; height: 8px; background-color: #00f7ff; border-radius: 10px; transition: all 0.3s; }
 
-/* ANIMAÇÃO DE FALA */
-@keyframes talking {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(3); height: 12px; }
-}
+@keyframes talking { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(4); height: 12px; } }
 .is-talking { animation: talking 0.2s infinite; }
 
-/* CLASSES DE EMOÇÃO */
 .feliz .eye { height: 20px; border-radius: 100px 100px 0 0; background: transparent; border: 6px solid #00f7ff; }
 .feliz .mouth { height: 40px; border-radius: 0 0 100px 100px; border: 6px solid #00f7ff; border-top: none; background: transparent; }
-
 .bravo { filter: drop-shadow(0 0 15px #ff3300); }
 .bravo .eye { background-color: #ff3300; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
-.bravo .mouth { background-color: #ff3300; }
 
-.hud { position: fixed; bottom: 30px; display: flex; gap: 10px; }
-#inputTexto { background: transparent; border: 1px solid #00f7ff; color: white; padding: 10px; border-radius: 20px; }
-button { background: #00f7ff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+.hud { position: fixed; bottom: 30px; display: flex; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 30px; backdrop-filter: blur(5px); }
+#inputTexto { background: transparent; border: none; color: white; padding: 10px; outline: none; width: 150px; }
+button { background: #00f7ff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; }
