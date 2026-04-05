@@ -29,12 +29,18 @@ function iniciarSistemas() {
         .then(s => { video.srcObject = s; })
         .catch(err => console.warn("Câmera não disponível:", err));
     window.speechSynthesis.getVoices();
-    setTimeout(() => roboFalar("Acesso concedido. Olá, eu sou a LOOI."), 500);
+    setTimeout(() => {
+        ligarMicrofone(); // mic sempre ativo ao iniciar
+        roboFalar("Acesso concedido. Olá, eu sou a LOOI.");
+    }, 500);
 }
 
 // ── SÍNTESE DE VOZ ───────────────────────────────────────
+// Pausa o mic enquanto a LOOI fala para não ouvir a própria voz
 function roboFalar(texto) {
     window.speechSynthesis.cancel();
+    pararOuvinte(); // para de escutar enquanto fala
+
     const fala = new SpeechSynthesisUtterance(texto);
     fala.lang = 'pt-BR';
     const vozes = window.speechSynthesis.getVoices();
@@ -44,7 +50,10 @@ function roboFalar(texto) {
     fala.pitch = 1.2;
     fala.rate  = 1.0;
     fala.onstart = () => looiMouth.classList.add('is-talking');
-    fala.onend   = () => looiMouth.classList.remove('is-talking');
+    fala.onend   = () => {
+        looiMouth.classList.remove('is-talking');
+        setTimeout(iniciarOuvinte, 600); // retoma escuta após falar
+    };
     window.speechSynthesis.speak(fala);
 }
 
@@ -96,36 +105,81 @@ async function comunicar(texto) {
     }
 }
 
-// ── MICROFONE ────────────────────────────────────────────
+// ── MICROFONE SEMPRE ATIVO ───────────────────────────────
 const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
 const btnVoz = document.getElementById('btnVoz');
 
+let micAtivo   = false;  // controlado pelo botão
+let micRodando = false;  // estado real do objeto
+let ouvinte    = null;
+
+function iniciarOuvinte() {
+    if (!micAtivo || micRodando || !ouvinte) return;
+    try { ouvinte.start(); } catch(e) {}
+}
+
+function pararOuvinte() {
+    if (!ouvinte) return;
+    try { ouvinte.stop(); } catch(e) {}
+}
+
+function ligarMicrofone() {
+    micAtivo = true;
+    btnVoz.textContent = '🔴';
+    btnVoz.title = 'Microfone ligado — clique para desligar';
+    iniciarOuvinte();
+}
+
+function desligarMicrofone() {
+    micAtivo = false;
+    btnVoz.textContent = '🎤';
+    btnVoz.title = 'Microfone desligado — clique para ligar';
+    pararOuvinte();
+}
+
 if (Reconhecimento) {
-    const ouvinte = new Reconhecimento();
-    ouvinte.lang = 'pt-BR';
-    ouvinte.continuous     = false;
-    ouvinte.interimResults = false;
+    ouvinte = new Reconhecimento();
+    ouvinte.lang           = 'pt-BR';
+    ouvinte.continuous     = true;   // não para sozinho após detectar fala
+    ouvinte.interimResults = false;  // só resultados finais
+
+    ouvinte.onstart = () => { micRodando = true; };
 
     ouvinte.onresult = (e) => {
-        const transcricao = e.results[0][0].transcript;
+        const resultado = e.results[e.results.length - 1];
+        if (!resultado.isFinal) return;
+        const transcricao = resultado[0].transcript.trim();
+        if (!transcricao) return;
         console.log("Ouvi:", transcricao);
         input.value = transcricao;
         comunicar(transcricao);
     };
 
-    ouvinte.onstart = () => { btnVoz.textContent = '🔴'; };
-    ouvinte.onend   = () => { btnVoz.textContent = '🎤'; };
+    ouvinte.onend = () => {
+        micRodando = false;
+        // Reinicia automaticamente se deve continuar ativo
+        if (micAtivo) setTimeout(iniciarOuvinte, 300);
+    };
+
     ouvinte.onerror = (e) => {
+        micRodando = false;
         console.error("Erro microfone:", e.error);
-        btnVoz.textContent = '🎤';
         if (e.error === 'not-allowed') {
+            micAtivo = false;
+            btnVoz.textContent = '🎤';
             alert("Permissão de microfone negada.\nClique no cadeado do navegador e permita o microfone.");
+        }
+        if (micAtivo && e.error !== 'not-allowed') {
+            setTimeout(iniciarOuvinte, 1000);
         }
     };
 
+    // Botão alterna ligar/desligar
     btnVoz.onclick = () => {
-        try { ouvinte.start(); } catch(e) { console.warn(e); }
+        if (micAtivo) desligarMicrofone();
+        else          ligarMicrofone();
     };
+
 } else {
     btnVoz.disabled = true;
     btnVoz.title = "Use o Chrome para reconhecimento de voz.";
