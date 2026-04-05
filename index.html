@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS ULTRA</title>
+    <title>LOOI OS ULTRA - v5.0 Imersivo</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilo.css">
 </head>
@@ -11,13 +11,17 @@
 
     <div id="tela-login">
         <div class="glass-box">
-            <h1 class="neon-text">LOOI CORE</h1>
-            <input type="password" id="senhaInput" placeholder="Senha">
-            <button onclick="verificarSenha()" class="btn-glow">ENTRAR</button>
+            <h1 class="neon-text">LOOI OS</h1>
+            <p>BIOMETRIA REQUERIDA</p>
+            <input type="password" id="senhaInput" placeholder="Sinal de Acesso">
+            <button onclick="verificarSenha()" class="btn-glow">AUTENTICAR</button>
+            <p id="erroMsg" style="display:none; color: red;">ACESSO NEGADO!</p>
         </div>
     </div>
 
     <div id="conteudo-robo" style="display:none;">
+        
+        <button id="exit-fullscreen-btn" onclick="toggleFullScreen()" title="Sair da Tela Cheia">❌</button>
         <button id="mic-fullscreen" onclick="ativarVoz()">🎤</button>
 
         <div class="hud-lateral">
@@ -25,7 +29,7 @@
             <div class="stat-item">LINK <div class="bar"><div id="mem-bar" class="fill"></div></div></div>
         </div>
 
-        <div class="face-wrapper" id="pet-area">
+        <div class="face-wrapper">
             <div id="looi-face" class="face neutral">
                 <div class="eyes">
                     <div class="eye left"></div>
@@ -41,25 +45,28 @@
 
         <div class="bottom-interface">
             <div class="chat-container">
-                <input type="text" id="inputTexto" placeholder="Fale com a Looi...">
+                <input type="text" id="inputTexto" placeholder="Conversar com Looi...">
                 <div class="btns-group">
                     <button id="btnEnviar">➤</button>
                     <button onclick="ativarVoz()">🎤</button>
-                    <button onclick="toggleFS()">📺</button>
+                    <button onclick="toggleFullScreen()">📺</button>
                     <button onclick="toggleMenu()">⚙️</button>
                 </div>
             </div>
         </div>
 
         <div id="menu-config" class="config-popup">
-            <h3>CONFIG</h3>
-            <input type="text" id="configUrl" placeholder="Link LocalTunnel">
+            <h3>PAINEL</h3>
+            <p>Link do LocalTunnel:</p>
+            <input type="text" id="configUrl" placeholder="https://exemplo.loca.lt">
             <button onclick="salvarConfig()">SALVAR</button>
+            <button onclick="toggleMenu()" class="btn-close">FECHAR</button>
         </div>
     </div>
 
     <video id="video" autoplay playsinline style="display:none"></video>
     <canvas id="canvas" style="display:none"></canvas>
+
     <script src="script.js"></script>
 </body>
 </html>
