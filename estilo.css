@@ -1,78 +1,164 @@
-body { background: #000; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; overflow: hidden; font-family: sans-serif; }
-
-#tela-login { position: fixed; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 100; }
-.login-box { border: 2px solid #00f7ff; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 0 20px #00f7ff; }
-#senhaInput { background: transparent; border: 1px solid #00f7ff; color: #fff; padding: 10px; border-radius: 5px; text-align: center; outline: none; }
-
-.face { display: flex; flex-direction: column; align-items: center; gap: 60px; filter: drop-shadow(0 0 15px #00f7ff); transition: 0.3s; }
-.eyes { display: flex; gap: 50px; }
-
-/* OLHOS PREENCHIDOS CIANO */
-.eye { width: 90px; height: 90px; background: #00f7ff; border-radius: 50%; transition: 0.3s; }
-
-/* --- CONFIGURAÇÃO BASE DA BOCA (CALADA) --- */
-.mouth {
-    /* Forma inicial: Uma elipse vazada (apenas borda) */
-    width: 60px; /* Largura menor que a anterior */
-    height: 30px; /* Mais alta, para parecer uma boca oval */
-    border-radius: 50%; /* Faz a forma oval perfeita */
-    background-color: transparent; /* FUNDO VAZADO */
-    
-    /* A "pele" da boca: Borda ciano com brilho neon */
-    border: 5px solid #00f7ff; 
-    filter: drop-shadow(0 0 10px #00f7ff);
-    
-    /* Transição suave para qualquer mudança */
-    transition: all 0.3s ease-out;
-    margin-top: -20px; /* Ajuste para centralizar entre os olhos e o HUD */
+:root {
+    --neon-blue: #00f7ff;
+    --neon-red: #ff3300;
+    --neon-purple: #bc13fe;
+    --bg-dark: #050505;
 }
 
-/* --- ANIMAÇÃO DE FALA (MODO ONDA SONORA) --- */
-/* Quando o JS adiciona '.is-talking', a boca vibra */
-.is-talking {
-    animation: waveSpeak 0.2s infinite alternate ease-in-out;
+body {
+    background-color: var(--bg-dark);
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    overflow: hidden;
 }
 
-/* Os "nervos" da animação de onda */
-@keyframes waveSpeak {
-    0% {
-        /* Estado inicial da elipse calada */
-        transform: scaleY(1);
-        border-width: 5px;
-    }
-    100% {
-        /* Estado esticado: Vira uma "onda" vertical */
-        transform: scaleY(3); /* Estica 3x mais alto */
-        border-width: 2px; /* A borda afina para parecer que está esticando */
-        filter: drop-shadow(0 0 15px #00f7ff); /* O brilho aumenta */
-    }
+/* --- LOGIN GLASSMORPHISM --- */
+#tela-login {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #101010 0%, #000 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
-
-/* --- AJUSTES DE EXPRESSÃO NA BOCA --- */
-
-/* Boca Feliz (Sorriso Oval) */
-.feliz .mouth {
-    border-radius: 10px 10px 100px 100px; /* Canto de baixo mais arredondado */
-    height: 40px;
-    border-top-width: 2px; /* Linha de cima mais fina */
-    background-color: rgba(0, 247, 255, 0.1); /* Um leve preenchimento ciano */
+.glass-box {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 247, 255, 0.2);
+    padding: 50px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
-
-/* Boca Brava (Linha Reta e Séria) */
-.bravo .mouth {
-    border-radius: 5px; /* Quase um retângulo */
-    height: 6px; /* Volta a ser uma linha fina */
-    width: 130px; /* Mais comprida */
-    background-color: #ff3300; /* Vira vermelha */
+.neon-text { color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
+.btn-glow {
+    background: var(--neon-blue);
     border: none;
-    filter: drop-shadow(0 0 10px #ff3300);
+    padding: 10px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
 }
 
-/* Boca Surpresa (Um Círculo Perfeito "O") */
-.surpreso .mouth {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%; /* Círculo perfeito */
-    border-width: 6px;
-    background-color: transparent;
+/* --- HUD DE STATUS --- */
+.hud-lateral {
+    position: fixed;
+    top: 20px;
+    padding: 20px;
+    background: rgba(0, 247, 255, 0.05);
+    border-radius: 10px;
+    border-left: 3px solid var(--neon-blue);
+}
+.hud-lateral.left { left: 20px; }
+.stat-item { margin-bottom: 15px; font-size: 12px; }
+.bar { width: 100px; height: 4px; background: #222; margin-top: 5px; }
+.fill { height: 100%; background: var(--neon-blue); transition: width 0.5s; }
+
+/* --- ROSTO E OLHOS --- */
+.face-container {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: floating 3s infinite ease-in-out;
+}
+@keyframes floating {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+.eyes { display: flex; gap: 60px; margin-bottom: 50px; }
+.eye {
+    width: 90px;
+    height: 90px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 25px var(--neon-blue);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pupil {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    top: 20%;
+    left: 20%;
+}
+
+/* ANIMAÇÃO PISCAR */
+.eye { animation: blink 5s infinite; }
+@keyframes blink {
+    0%, 96%, 100% { transform: scaleY(1); }
+    98% { transform: scaleY(0.1); }
+}
+
+/* --- BOCA DINÂMICA --- */
+.mouth {
+    width: 80px;
+    height: 10px;
+    border: 4px solid var(--neon-blue);
+    border-radius: 20px;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+.is-talking { animation: talking 0.15s infinite alternate; }
+@keyframes talking {
+    from { height: 10px; transform: scaleX(1); }
+    to { height: 40px; transform: scaleX(1.1); }
+}
+
+/* --- CLASSES DE EXPRESSÃO --- */
+.feliz .eye { height: 40px; border-radius: 100px 100px 0 0; background: transparent; border: 8px solid var(--neon-blue); }
+.feliz .mouth { height: 35px; border-radius: 0 0 100px 100px; }
+
+.bravo { filter: drop-shadow(0 0 20px var(--neon-red)); }
+.bravo .eye { background: var(--neon-red); clip-path: polygon(0% 20%, 100% 0%, 100% 100%, 0% 100%); }
+.bravo .mouth { width: 120px; background: var(--neon-red); }
+
+.surpreso .eye { width: 110px; height: 110px; }
+.surpreso .mouth { width: 40px; height: 40px; border-radius: 50%; }
+
+.triste .eye { transform: rotate(15deg); height: 50px; }
+.triste .mouth { width: 60px; height: 10px; transform: rotate(-5deg); }
+
+.dormindo .eye { height: 5px; box-shadow: none; opacity: 0.5; }
+.dormindo .mouth { width: 20px; opacity: 0.5; }
+
+/* --- INTERFACE DE CHAT --- */
+.bottom-interface { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; }
+.chat-box {
+    background: rgba(255,255,255,0.07);
+    padding: 10px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(0,247,255,0.3);
+    width: 400px;
+}
+#inputTexto { background: transparent; border: none; color: white; flex: 1; padding: 10px; outline: none; }
+.btns-group button { background: transparent; border: none; color: var(--neon-blue); font-size: 20px; cursor: pointer; margin-left: 10px; transition: 0.2s; }
+.btns-group button:hover { transform: scale(1.2); text-shadow: 0 0 10px var(--neon-blue); }
+
+.config-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #111;
+    border: 2px solid var(--neon-blue);
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 2000;
 }
