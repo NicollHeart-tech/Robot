@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS MOBILE - v7.0</title>
+    <title>LOOI OS - Versão Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilo.css">
 </head>
@@ -12,26 +12,26 @@
     <div id="tela-login">
         <div class="glass-box">
             <h1 class="neon-text">LOOI CORE</h1>
-            <input type="password" id="senhaInput" placeholder="Sinal">
-            <button onclick="verificarSenha()" class="btn-glow">LOGIN</button>
+            <input type="password" id="senhaInput" placeholder="Senha">
+            <button onclick="verificarSenha()" class="btn-glow">ENTRAR</button>
         </div>
     </div>
 
     <div id="conteudo-robo" style="display:none;">
         
-        <button id="exit-fullscreen-btn" onclick="toggleFullScreen()">❌</button>
+        <button id="exit-fullscreen-btn" onclick="toggleFS()">❌</button>
         <button id="mic-fullscreen" onclick="ativarVoz()">🎤</button>
         
-        <div id="container-confirmar">
-             <button id="confirmar-voz-fs" onclick="confirmarEnvio()">ENVIAR COMANDO ✔️</button>
+        <div id="area-confirmacao">
+             <button id="btn-confirmar-envio" onclick="confirmarEnvio()">ENVIAR PARA IA ✔️</button>
         </div>
 
         <div class="hud-lateral">
-            <div class="stat-item">CPU <div class="bar"><div id="cpu-bar" class="fill"></div></div></div>
-            <div class="stat-item">MEM <div class="bar"><div id="mem-bar" class="fill"></div></div></div>
+            <div class="stat">CPU <div class="bar"><div id="cpu-bar" class="fill"></div></div></div>
+            <div class="stat">MEM <div class="bar"><div id="mem-bar" class="fill"></div></div></div>
         </div>
 
-        <div class="face-wrapper" id="pet-area">
+        <div class="main-screen">
             <div id="looi-face" class="face neutral">
                 <div class="eyes">
                     <div class="eye left"></div>
@@ -47,11 +47,11 @@
 
         <div class="bottom-interface">
             <div class="chat-container">
-                <input type="text" id="inputTexto" placeholder="Fale ou escreva...">
-                <div class="btns-group">
-                    <button id="btnEnviar">➤</button>
+                <input type="text" id="inputTexto" placeholder="Escreva aqui...">
+                <div class="btns">
+                    <button onclick="comunicar(document.getElementById('inputTexto').value)">➤</button>
                     <button onclick="ativarVoz()">🎤</button>
-                    <button onclick="toggleFullScreen()">📺</button>
+                    <button onclick="toggleFS()">📺</button>
                 </div>
             </div>
         </div>
