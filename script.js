@@ -11,7 +11,7 @@ const input = document.getElementById('inputTexto');
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 
-// 1. LOGIN
+// 1. LOGIN E HARDWARE
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
         document.getElementById('tela-login').style.display = "none";
@@ -36,13 +36,14 @@ function iniciarVisaoLive() {
     setInterval(() => {
         // Envia frames para o Python a cada 1 segundo em baixa resolução
         if (!ocupada && video.videoWidth > 0 && document.getElementById('conteudo-robo').style.display !== "none") {
+            // Tira uma foto pequena (160px) para ser ultra fluido
             canvas.width = 160; canvas.height = 120;
             canvas.getContext('2d').drawImage(video, 0, 0, 160, 120);
             
-            const frameData = canvas.toDataURL('image/jpeg', 0.5);
+            const frameData = canvas.toDataURL('image/jpeg', 0.5); // Qualidade 0.5 para não lagar o túnel
             socket.emit('stream_frame', frameData); // Envia pelo túnel aberto
         }
-    }, 1000); 
+    }, 1000); // 1 frame por segundo é o ideal para o LocalTunnel aguentar
 }
 
 function toggleFullScreen() {
@@ -56,9 +57,13 @@ const ouvinte = Rec ? new Rec() : null;
 
 if (ouvinte) {
     ouvinte.lang = 'pt-BR';
+    ouvinte.onstart = () => { document.body.style.boxShadow = "inset 0 0 50px #00f7ff"; };
+    ouvinte.onend = () => { document.body.style.boxShadow = "none"; };
+    
     ouvinte.onresult = (e) => {
         textoVoz = e.results[0][0].transcript;
         input.value = textoVoz;
+        // Mostra o botão de confirmar no meio da tela
         document.getElementById('container-confirmar').style.display = "block";
     };
 }
@@ -80,7 +85,7 @@ function enviarTexto() {
     }
 }
 
-// 4. RECEBER RESPOSTAS DO PYTHON
+// 4. RECEBER RESPOSTAS DO PYTHON E FALAR
 socket.on('ai_answer', (dados) => {
     looiFace.className = 'face ' + dados.emocao.toLowerCase();
     roboFalar(dados.resposta);
