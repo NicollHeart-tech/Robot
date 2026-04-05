@@ -1,6 +1,6 @@
 let URL_SERV = localStorage.getItem('looi_url') || "https://looi-robot.loca.lt";
 let ocupada = false;
-let textoCapturado = ""; // Armazena o que a IA ouviu
+let textoCapturado = "";
 
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
@@ -11,10 +11,10 @@ function verificarSenha() {
 }
 
 function iniciarHardware() {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(s => {
-        document.getElementById('video').srcObject = s;
-    });
-    roboFalar("Modo Imersivo ativo. Estou pronta.");
+    // Adicionado o playsinline para funcionar vídeo no celular
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true })
+        .then(s => { document.getElementById('video').srcObject = s; });
+    roboFalar("LOOI iniciada no modo mobile.");
 }
 
 function toggleFullScreen() {
@@ -22,33 +22,23 @@ function toggleFullScreen() {
     else document.exitFullscreen();
 }
 
-// --- SISTEMA DE VOZ COM CONFIRMAÇÃO ---
+// --- RECONHECIMENTO DE VOZ ---
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
 const ouvinte = Rec ? new Rec() : null;
 
 if (ouvinte) {
     ouvinte.lang = 'pt-BR';
-    ouvinte.continuous = false; 
-
-    ouvinte.onstart = () => {
-        document.body.style.boxShadow = "inset 0 0 60px var(--neon)";
-        console.log("Ouvindo...");
-    };
-
+    ouvinte.onstart = () => { document.body.style.boxShadow = "inset 0 0 50px #00f7ff"; };
+    
     ouvinte.onresult = (e) => {
         textoCapturado = e.results[0][0].transcript;
-        document.getElementById('inputTexto').value = textoCapturado; // Mostra o texto na barra
+        document.getElementById('inputTexto').value = textoCapturado;
         
-        // MOSTRA OS BOTÕES DE CONFIRMAÇÃO
-        document.getElementById('btnConfirmar').style.display = "block";
-        document.getElementById('confirmar-voz-fs').style.display = "block";
-        
-        console.log("Detectado: " + textoCapturado);
+        // MOSTRA O BOTÃO DE CONFIRMAR NO MEIO DA TELA
+        document.getElementById('container-confirmar').style.display = "block";
     };
 
-    ouvinte.onend = () => {
-        document.body.style.boxShadow = "none";
-    };
+    ouvinte.onend = () => { document.body.style.boxShadow = "none"; };
 }
 
 function ativarVoz() {
@@ -58,13 +48,10 @@ function ativarVoz() {
     }
 }
 
-// FUNÇÃO QUE REALMENTE ENVIA PARA O PYTHON
 function confirmarEnvio() {
     if (textoCapturado !== "") {
         comunicar(textoCapturado);
-        // Esconde os botões após enviar
-        document.getElementById('btnConfirmar').style.display = "none";
-        document.getElementById('confirmar-voz-fs').style.display = "none";
+        document.getElementById('container-confirmar').style.display = "none";
         textoCapturado = "";
     }
 }
@@ -82,8 +69,8 @@ function comunicar(texto) {
     if (!texto || ocupada) return;
     const canv = document.getElementById('canvas');
     const vid = document.getElementById('video');
-    canv.width = 400; canv.height = 300;
-    canv.getContext('2d').drawImage(vid, 0, 0, 400, 300);
+    canv.width = 300; canv.height = 225; // Imagem menor para o celular carregar rápido
+    canv.getContext('2d').drawImage(vid, 0, 0, 300, 225);
 
     canv.toBlob(blob => {
         const fd = new FormData();
@@ -98,8 +85,10 @@ function comunicar(texto) {
     }, 'image/jpeg');
 }
 
-// Eventos de botões
-document.getElementById('btnEnviar').onclick = () => comunicar(document.getElementById('inputTexto').value);
+document.getElementById('btnEnviar').onclick = () => {
+    comunicar(document.getElementById('inputTexto').value);
+    document.getElementById('inputTexto').value = "";
+};
 
 function toggleMenu() {
     const m = document.getElementById('menu-config');
