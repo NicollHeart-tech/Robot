@@ -3,34 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS - Moondream Edition</title>
+    <title>LOOI OS - Ultra Edition</title>
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
     <div id="tela-login">
-        <div class="login-box">
-            <h1 style="color:#00f7ff; letter-spacing:5px;">LOOI OS</h1>
-            <p style="color:white">Insere a Chave de Acesso</p>
-            <input type="password" id="senhaInput" placeholder="******">
-            <button onclick="verificarSenha()">ENTRAR</button>
-            <p id="erroMsg" style="display:none; color:red;">SENHA INCORRETA</p>
+        <div class="glass-box">
+            <h1 class="neon-text">LOOI CORE v3.0</h1>
+            <p>BIOMETRIA DIGITAL REQUERIDA</p>
+            <input type="password" id="senhaInput" placeholder="Senha de Acesso">
+            <button onclick="verificarSenha()" class="btn-glow">AUTENTICAR</button>
+            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">ACESSO NEGADO!</p>
         </div>
     </div>
 
-    <div id="conteudo-robo" style="display:none; flex-direction:column; align-items:center;">
-        <div class="face neutral" id="looi-face">
-            <div class="eyes">
-                <div class="eye left"></div>
-                <div class="eye right"></div>
-            </div>
-            <div class="mouth" id="looi-mouth"></div>
+    <div id="conteudo-robo" style="display:none;">
+        
+        <div class="hud-lateral left">
+            <div class="stat-item"><span class="label">CPU</span> <div class="bar"><div id="cpu-bar" class="fill"></div></div></div>
+            <div class="stat-item"><span class="label">MEM</span> <div class="bar"><div id="mem-bar" class="fill"></div></div></div>
+            <div class="stat-item"><span class="label">MOOD</span> <span id="status-mood">STABLE</span></div>
         </div>
 
-        <div class="hud">
-            <input type="text" id="inputTexto" placeholder="Conversar...">
-            <button id="btnEnviar">➤</button>
-            <button id="btnVoz">🎤</button>
+        <div class="face-container" id="pet-area">
+            <div id="looi-face" class="face neutral">
+                <div class="eyes">
+                    <div class="eye-group">
+                        <div class="eye left"><div class="pupil"></div></div>
+                    </div>
+                    <div class="eye-group">
+                        <div class="eye right"><div class="pupil"></div></div>
+                    </div>
+                </div>
+                <div class="mouth-container">
+                    <div class="mouth" id="looi-mouth"></div>
+                </div>
+            </div>
+            <div id="reacao-texto"></div>
+        </div>
+
+        <div class="bottom-interface">
+            <div class="chat-box">
+                <input type="text" id="inputTexto" placeholder="Comando de voz ou texto...">
+                <div class="btns-group">
+                    <button id="btnEnviar" title="Enviar">➤</button>
+                    <button id="btnVoz" title="Microfone">🎤</button>
+                    <button id="btnConfig" onclick="toggleMenu()" title="Configurações">⚙️</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="menu-config" class="config-popup">
+            <h3>PAINEL DE CONTROLE</h3>
+            <label>Link do Servidor (LocalTunnel):</label>
+            <input type="text" id="configUrl" placeholder="https://...">
+            <button onclick="salvarConfig()" class="btn-save">SALVAR</button>
         </div>
     </div>
 
