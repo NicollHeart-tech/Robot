@@ -1,14 +1,16 @@
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-const looiFace = document.getElementById('looi-face');
+const videoEl   = document.getElementById('video');
+const canvas    = document.getElementById('canvas');
+const ctx       = canvas.getContext('2d');
+const looiFace  = document.getElementById('looi-face');
 const looiMouth = document.getElementById('looi-mouth');
-const input = document.getElementById('inputTexto');
+const input     = document.getElementById('inputTexto');
 
-// COLOQUE AQUI O SEU LINK DO CLOUDFLARE/PINGGY
-const URL_TUNEL = "https://looi-robot.loca.lt"; 
+// ⚠️ COLOQUE AQUI O SEU LINK DO LOCALTUNNEL (ex: https://xxx.loca.lt)
+const URL_TUNEL = "https://looi-robot.loca.lt";
 
-// Função que confere a senha para liberar o sistema
+const HEADERS_TUNNEL = { 'bypass-tunnel-reminder': 'true' };
+
+// ── LOGIN ─────────────────────────────────────────────────
 function verificarSenha() {
     const senha = document.getElementById('senhaInput').value;
     if (senha === "233442") {
@@ -20,75 +22,235 @@ function verificarSenha() {
     }
 }
 
-// Liga a câmera do usuário e dá as boas-vindas
+// ── INICIALIZAÇÃO ─────────────────────────────────────────
 function iniciarSistemas() {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-        .then(s => video.srcObject = s);
-    roboFalar("Acesso concedido. Olá, eu sou a LOOI.");
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+        .then(stream => { videoEl.srcObject = stream; })
+        .catch(err => console.warn("Câmera não disponível:", err));
+
+    window.speechSynthesis.getVoices();
+    setTimeout(() => {
+        ligarMicrofone();
+        roboFalar("Acesso concedido. Olá, eu sou a LOOI.");
+    }, 600);
+
+    agendarPiscar(); // inicia animação de piscar
 }
 
-// Faz o navegador falar o texto e anima a boca da LOOI
+// ── SÍNTESE DE VOZ ────────────────────────────────────────
 function roboFalar(texto) {
     window.speechSynthesis.cancel();
-    const f = new SpeechSynthesisUtterance(texto);
-    f.lang = 'pt-BR';
+    pararOuvinte();
+
+    const fala = new SpeechSynthesisUtterance(texto);
+    fala.lang = 'pt-BR';
     const vozes = window.speechSynthesis.getVoices();
-    f.voice = vozes.find(v => v.name.includes('Google')) || vozes[0];
-    f.pitch = 1.2;
-    f.onstart = () => looiMouth.classList.add('is-talking');
-    f.onend = () => looiMouth.classList.remove('is-talking');
-    window.speechSynthesis.speak(f);
+    fala.voice = vozes.find(v => v.lang.startsWith('pt') && v.name.toLowerCase().includes('google'))
+              || vozes.find(v => v.lang.startsWith('pt'))
+              || vozes[0];
+    fala.pitch = 1.2;
+    fala.rate  = 1.0;
+    fala.onstart = () => looiMouth.classList.add('is-talking');
+    fala.onend   = () => {
+        looiMouth.classList.remove('is-talking');
+        setTimeout(iniciarOuvinte, 600);
+    };
+    window.speechSynthesis.speak(fala);
 }
 
-// Envia o que você digitou ou falou para o Python (Cérebro)
-function comunicar(texto) {
-    fetch(`${URL_TUNEL}/interagir`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({texto: texto})
-    })
-    .then(r => r.json())
-    .then(dados => {
-        // Muda a cara da LOOI baseado na emoção que a IA sentiu
-        looiFace.className = 'face ' + dados.emocao.toLowerCase();
-        roboFalar(dados.resposta);
+// ── CÂMERA — captura um frame para conversas ──────────────
+function capturarFrame() {
+    return new Promise((resolve) => {
+        if (videoEl.videoWidth > 0) {
+            canvas.width  = 320;
+            canvas.height = 240;
+            ctx.drawImage(videoEl, 0, 0, 320, 240);
+            canvas.toBlob(resolve, 'image/jpeg');
+        } else {
+            resolve(null);
+        }
     });
 }
 
-// Configuração do microfone (Reconhecimento de Voz)
-const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
-const ouvinte = new Reconhecimento();
-ouvinte.lang = 'pt-BR';
-ouvinte.onresult = (e) => comunicar(e.results[0][0].transcript);
+// ── FOTO A CADA 2.5 SEGUNDOS ─────────────────────────────
+let analisandoFoto = false; // evita acumular chamadas simultâneas
 
-// Botões da interface
-document.getElementById('btnEnviar').onclick = () => { comunicar(input.value); input.value = ""; };
-document.getElementById('btnVoz').onclick = () => ouvinte.start();
+async function analisarFoto() {
+    if (analisandoFoto) return; // descarta se a anterior ainda não terminou
+    analisandoFoto = true;
 
-// --- SISTEMA DE VISÃO DA LOOI (Onde a mágica acontece) ---
-setInterval(() => {
-    if (video.videoWidth > 0) {
-        // 1. Definimos o tamanho da foto para 480p (640 de largura por 480 de altura)
-        canvas.width = 640; 
-        canvas.height = 480;
-        
-        // 2. Tiramos o "print" do vídeo e colamos no Canvas
-        ctx.drawImage(video, 0, 0, 640, 480);
-        
-        // 3. Transformamos o desenho em um arquivo de imagem (JPEG)
-        canvas.toBlob(blob => {
-            const fd = new FormData(); 
-            fd.append('imagem', blob);
-            
-            // 4. Enviamos para a IA analisar a imagem
-            fetch(`${URL_TUNEL}/pensar`, { method: 'POST', body: fd })
-            .then(r => r.text())
-            .then(emocao => { 
-                // Se a IA detectar uma emoção só de olhar, a LOOI muda de expressão
-                if(emocao !== "NEUTRO") {
-                    looiFace.className = 'face ' + emocao.toLowerCase();
-                }
-            });
-        }, 'image/jpeg', 0.7); // 0.7 economiza um pouco de internet sem perder qualidade
+    const blob = await capturarFrame();
+    if (!blob) { analisandoFoto = false; return; }
+
+    const fd = new FormData();
+    fd.append('texto', 'Descreva brevemente o que está vendo.');
+    fd.append('imagem', blob, 'visao.jpg');
+
+    try {
+        const r = await fetch(`${URL_TUNEL}/interagir`, {
+            method: 'POST',
+            headers: HEADERS_TUNNEL,
+            body: fd
+        });
+        if (r.ok) {
+            const dados = await r.json();
+            if (dados.emocao && dados.emocao !== 'NEUTRO') {
+                aplicarEmocao(dados.emocao);
+            }
+        }
+    } catch (_) {}
+
+    analisandoFoto = false;
+}
+
+setInterval(analisarFoto, 2500);
+
+// ── EXPRESSÕES ────────────────────────────────────────────
+function aplicarEmocao(emocao) {
+    const e = (emocao || 'neutro').toLowerCase();
+    looiFace.className = 'face ' + e;
+}
+
+// ── ANIMAÇÃO: PISCAR ──────────────────────────────────────
+function piscar() {
+    // Não pisca enquanto está com emoção forte (bravo/surpreso)
+    if (looiFace.classList.contains('bravo') || looiFace.classList.contains('surpreso')) return;
+
+    const olhos = looiFace.querySelectorAll('.eye');
+    olhos.forEach(o => o.style.transform = 'scaleY(0.06)');
+    setTimeout(() => {
+        olhos.forEach(o => o.style.transform = '');
+    }, 130);
+}
+
+function agendarPiscar() {
+    // Intervalo aleatório entre 2.5s e 6s — mais natural
+    const delay = 2500 + Math.random() * 3500;
+    setTimeout(() => {
+        piscar();
+        // Às vezes pisca duas vezes seguidas
+        if (Math.random() < 0.25) {
+            setTimeout(piscar, 280);
+        }
+        agendarPiscar();
+    }, delay);
+}
+
+// ── COMUNICAÇÃO COM A IA (conversa) ───────────────────────
+async function comunicar(texto) {
+    if (!texto || !texto.trim()) return;
+
+    const blob = await capturarFrame();
+    const fd   = new FormData();
+    fd.append('texto', texto);
+    if (blob) fd.append('imagem', blob, 'visao.jpg');
+
+    try {
+        const r = await fetch(`${URL_TUNEL}/interagir`, {
+            method: 'POST',
+            headers: HEADERS_TUNNEL,
+            body: fd
+        });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const dados = await r.json();
+        aplicarEmocao(dados.emocao);
+        roboFalar(dados.resposta);
+    } catch (err) {
+        console.error("Erro ao comunicar:", err);
+        aplicarEmocao('triste');
+        roboFalar("Não consegui falar com meu cérebro.");
     }
-}, 1500); // 1500 milissegundos = 1.5 segundo
+}
+
+// ── MICROFONE SEMPRE ATIVO ────────────────────────────────
+const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
+const btnVoz = document.getElementById('btnVoz');
+
+let micAtivo   = false;
+let micRodando = false;
+let ouvinte    = null;
+
+function iniciarOuvinte() {
+    if (!micAtivo || micRodando || !ouvinte) return;
+    try { ouvinte.start(); } catch(e) {}
+}
+
+function pararOuvinte() {
+    if (!ouvinte) return;
+    try { ouvinte.stop(); } catch(e) {}
+}
+
+function ligarMicrofone() {
+    micAtivo = true;
+    btnVoz.textContent = '🔴';
+    btnVoz.title = 'Microfone ligado — clique para desligar';
+    iniciarOuvinte();
+}
+
+function desligarMicrofone() {
+    micAtivo = false;
+    btnVoz.textContent = '🎤';
+    btnVoz.title = 'Microfone desligado — clique para ligar';
+    pararOuvinte();
+}
+
+if (Reconhecimento) {
+    ouvinte = new Reconhecimento();
+    ouvinte.lang           = 'pt-BR';
+    ouvinte.continuous     = true;
+    ouvinte.interimResults = false;
+
+    ouvinte.onstart = () => { micRodando = true; };
+
+    ouvinte.onresult = (e) => {
+        const resultado = e.results[e.results.length - 1];
+        if (!resultado.isFinal) return;
+        const transcricao = resultado[0].transcript.trim();
+        if (!transcricao) return;
+        console.log("Ouvi:", transcricao);
+        input.value = transcricao;
+        comunicar(transcricao);
+        setTimeout(() => { input.value = ""; }, 1500); // mostra 1.5s e limpa
+    };
+
+    ouvinte.onend = () => {
+        micRodando = false;
+        if (micAtivo) setTimeout(iniciarOuvinte, 300);
+    };
+
+    ouvinte.onerror = (e) => {
+        micRodando = false;
+        if (e.error === 'not-allowed') {
+            micAtivo = false;
+            btnVoz.textContent = '🎤';
+            alert("Permissão de microfone negada.\nClique no cadeado e permita o microfone.");
+        }
+        if (micAtivo && e.error !== 'not-allowed') {
+            setTimeout(iniciarOuvinte, 1000);
+        }
+    };
+
+    btnVoz.onclick = () => {
+        if (micAtivo) desligarMicrofone();
+        else          ligarMicrofone();
+    };
+} else {
+    btnVoz.disabled = true;
+    btnVoz.title = "Use o Chrome para reconhecimento de voz.";
+}
+
+// ── ENVIAR TEXTO ──────────────────────────────────────────
+document.getElementById('btnEnviar').onclick = () => {
+    comunicar(input.value); input.value = "";
+};
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { comunicar(input.value); input.value = ""; }
+});
+
+// ── FULLSCREEN ────────────────────────────────────────────
+document.getElementById('btnFullscreen').onclick = () => {
+    if (!document.fullscreenElement)
+        document.documentElement.requestFullscreen().catch(() => {});
+    else
+        document.exitFullscreen();
+};
