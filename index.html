@@ -3,31 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS - Imersivo LIVE VLM</title>
+    <title>LOOI OS - Always Listening</title>
     <link rel="stylesheet" href="estilo.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
 
     <div id="tela-login">
         <div class="login-box">
-            <h1 class="titulo-seguranca">LOOI CORE</h1>
-            <p>CHAVE DE ACESSO REQUERIDA</p>
-            <input type="password" id="senhaInput" placeholder="Digite a senha">
-            <button onclick="verificarSenha()" id="btnAcessar">ENTRAR</button>
-            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">ACESSO NEGADO!</p>
+            <h1 class="neon-title">LOOI CORE</h1>
+            <input type="password" id="senhaInput" placeholder="Chave de Acesso">
+            <button onclick="verificarSenha()" id="btnAcessar">INICIAR SISTEMA</button>
         </div>
     </div>
 
     <div id="conteudo-robo" style="display:none;">
-        
         <button id="exit-fullscreen-btn" onclick="toggleFullScreen()">❌</button>
-        <button id="mic-fullscreen" onclick="ativarVoz()">🎤</button>
-        
-        <div id="container-confirmar">
-             <button id="btn-confirmar-envio" onclick="confirmarEnvio()">ENVIAR PARA IA ✔️</button>
-        </div>
+        <button id="mic-status-icon">🎤</button>
 
         <div class="main-display">
             <div id="looi-face" class="face neutral">
@@ -45,9 +37,7 @@
 
         <div class="hud">
             <div class="chat-area">
-                <input type="text" id="inputTexto" placeholder="Conversar...">
-                <button onclick="enviarTexto()">➤</button>
-                <button onclick="ativarVoz()">🎤</button>
+                <input type="text" id="inputTexto" placeholder="Ouvindo você...">
                 <button onclick="toggleFullScreen()">📺</button>
             </div>
         </div>
@@ -55,7 +45,6 @@
 
     <video id="video" autoplay playsinline style="display:none"></video>
     <canvas id="canvas" style="display:none"></canvas>
-    
-    <script src="script.js"></script> 
+    <script src="script.js"></script>
 </body>
 </html>
