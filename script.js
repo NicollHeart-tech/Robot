@@ -1,54 +1,72 @@
-// VARIÁVEIS DE ESTADO
+// CONFIGURAÇÕES INICIAIS
 let URL_SERVIDOR = localStorage.getItem('looi_url') || "https://looi-robot.loca.lt";
 let ocupada = false;
-let moodAtual = "NEUTRAL";
 
 const looiFace = document.getElementById('looi-face');
 const looiMouth = document.getElementById('looi-mouth');
 const input = document.getElementById('inputTexto');
 
-// 1. LOGIN E HARDWARE
+// 1. SISTEMA DE LOGIN
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
-        document.getElementById('tela-login').style.fadeOut = "slow";
         document.getElementById('tela-login').style.display = "none";
         document.getElementById('conteudo-robo').style.display = "flex";
-        iniciarHardware();
+        iniciarSistemas();
+    } else {
+        document.getElementById('erroMsg').style.display = "block";
     }
 }
 
-function iniciarHardware() {
+function iniciarSistemas() {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
         .then(s => document.getElementById('video').srcObject = s);
-    roboFalar("Protocolos LOOI v3 ativados. Como posso ajudar hoje?");
-    updateHUD();
+    roboFalar("Protocolos Ultra ativados. Todos os sistemas estão online.");
+    iniciarHUD();
 }
 
-// 2. SISTEMA DE FALA
+// 2. FUNÇÃO DE TELA CHEIA
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// 3. RECONHECIMENTO DE VOZ (CORRIGIDO)
+const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (Reconhecimento) {
+    const ouvinte = new Reconhecimento();
+    ouvinte.lang = 'pt-BR';
+    
+    ouvinte.onstart = () => { document.getElementById('btnVoz').style.color = "red"; };
+    ouvinte.onend = () => { document.getElementById('btnVoz').style.color = "#00f7ff"; };
+    
+    ouvinte.onresult = (e) => {
+        const resultado = e.results[0][0].transcript;
+        comunicar(resultado);
+    };
+
+    document.getElementById('btnVoz').onclick = () => ouvinte.start();
+}
+
+// 4. FALA E EMOÇÃO
 function roboFalar(texto) {
     window.speechSynthesis.cancel();
     const fala = new SpeechSynthesisUtterance(texto);
     fala.lang = 'pt-BR';
-    fala.pitch = 1.4;
-    fala.rate = 1.1;
-
-    fala.onstart = () => {
-        ocupada = true;
-        looiMouth.classList.add('is-talking');
-    };
-    fala.onend = () => {
-        looiMouth.classList.remove('is-talking');
-        ocupada = false;
-        setTimeout(() => setMood("NEUTRAL"), 2000);
-    };
+    fala.pitch = 1.3;
+    fala.onstart = () => { ocupada = true; looiMouth.classList.add('is-talking'); };
+    fala.onend = () => { looiMouth.classList.remove('is-talking'); ocupada = false; };
     window.speechSynthesis.speak(fala);
 }
 
-// 3. INTERAÇÃO (CHAT E VISÃO)
+// 5. COMUNICAÇÃO (ENVIAR PARA O PC)
 function comunicar(texto) {
     if (!texto || ocupada) return;
-    setMood("THINKING");
-
+    input.value = "";
+    
+    // Tira foto
     const canvas = document.getElementById('canvas');
     const video = document.getElementById('video');
     canvas.width = 400; canvas.height = 300;
@@ -66,37 +84,27 @@ function comunicar(texto) {
         })
         .then(r => r.json())
         .then(dados => {
-            setMood(dados.emocao);
+            looiFace.className = 'face ' + dados.emocao.toLowerCase();
             roboFalar(dados.resposta);
         })
-        .catch(() => {
-            setMood("SAD");
-            roboFalar("Falha crítica de conexão.");
-        });
+        .catch(() => roboFalar("Erro de conexão. Verifique o servidor."));
     }, 'image/jpeg');
 }
 
-// 4. FUNÇÕES DE STATUS E HUD
-function setMood(mood) {
-    looiFace.className = 'face ' + mood.toLowerCase();
-    document.getElementById('status-mood').innerText = mood.toUpperCase();
-}
-
-function updateHUD() {
+// 6. HUD E CARINHO
+function iniciarHUD() {
     setInterval(() => {
-        document.getElementById('cpu-bar').style.width = Math.floor(Math.random() * 40 + 20) + "%";
-        document.getElementById('mem-bar').style.width = Math.floor(Math.random() * 30 + 50) + "%";
+        document.getElementById('cpu-bar').style.width = (Math.random() * 50 + 20) + "%";
+        document.getElementById('mem-bar').style.width = (Math.random() * 30 + 40) + "%";
     }, 2000);
 }
 
-// 5. INTERAÇÃO FÍSICA (CARINHO)
 document.getElementById('pet-area').onclick = () => {
-    setMood("FELIZ");
-    const reacoes = ["Isso é bom!", "Hehe!", "Eu gosto de carinho.", "Processamento otimizado!"];
-    roboFalar(reacoes[Math.floor(Math.random() * reacoes.length)]);
+    looiFace.className = "face feliz";
+    roboFalar("Isso é muito bom, obrigada pelo carinho!");
 };
 
-// 6. CONFIGURAÇÕES
+// 7. MENU CONFIG
 function toggleMenu() {
     const m = document.getElementById('menu-config');
     m.style.display = m.style.display === "block" ? "none" : "block";
@@ -106,17 +114,9 @@ function salvarConfig() {
     if(novaUrl) {
         URL_SERVIDOR = novaUrl;
         localStorage.setItem('looi_url', novaUrl);
-        alert("Link atualizado com sucesso!");
         toggleMenu();
+        alert("Link Atualizado!");
     }
 }
 
-// EVENTOS
-document.getElementById('btnEnviar').onclick = () => { comunicar(input.value); input.value = ""; };
-const Reconhecimento = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(Reconhecimento) {
-    const ouvinte = new Reconhecimento();
-    ouvinte.lang = 'pt-BR';
-    ouvinte.onresult = (e) => comunicar(e.results[0][0].transcript);
-    document.getElementById('btnVoz').onclick = () => ouvinte.start();
-}
+document.getElementById('btnEnviar').onclick = () => comunicar(input.value);
