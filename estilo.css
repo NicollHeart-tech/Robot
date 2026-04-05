@@ -10,7 +10,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* ── TELA DE LOGIN ─────────────────────────────────────── */
+/* ── TELA DE LOGIN ──────────────────────────────────────── */
 #tela-login {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -40,21 +40,71 @@ body {
     display: block; width: 100%;
 }
 
-/* ── ROSTO ─────────────────────────────────────────────── */
+/* ── ANIMAÇÕES DO ROSTO ─────────────────────────────────── */
+
+/* Flutuação suave — sempre ativa */
+@keyframes flutuar {
+    0%, 100% { transform: translateY(0px);   }
+    50%       { transform: translateY(-10px); }
+}
+
+/* Pulsar suave dos olhos em idle */
+@keyframes pulsar-olho {
+    0%, 100% { box-shadow: 0 0 8px currentColor;  }
+    50%       { box-shadow: 0 0 22px currentColor; }
+}
+
+/* Animação de fala */
+@keyframes talking {
+    0%   { transform: scaleY(1)   scaleX(1);    }
+    25%  { transform: scaleY(2.2) scaleX(0.92); }
+    50%  { transform: scaleY(1.3) scaleX(1.05); }
+    75%  { transform: scaleY(2.8) scaleX(0.88); }
+    100% { transform: scaleY(1)   scaleX(1);    }
+}
+
+/* Vibração de raiva */
+@keyframes vibrar {
+    0%, 100% { transform: translateX(0)  translateY(0); }
+    25%       { transform: translateX(-3px) translateY(1px); }
+    75%       { transform: translateX(3px)  translateY(-1px); }
+}
+
+/* Salto de alegria */
+@keyframes saltitar {
+    0%, 100% { transform: translateY(0);    }
+    40%       { transform: translateY(-20px); }
+    60%       { transform: translateY(-20px); }
+}
+
+/* Tremor de susto */
+@keyframes susto {
+    0%, 100% { transform: scale(1);    }
+    30%       { transform: scale(1.06); }
+    60%       { transform: scale(0.96); }
+}
+
+/* ── ROSTO ──────────────────────────────────────────────── */
 .face {
     display: flex; flex-direction: column;
     justify-content: space-around; align-items: center;
     width: 300px; height: 400px;
     filter: drop-shadow(0 0 15px #00f7ff);
+    animation: flutuar 4s ease-in-out infinite;
     transition: filter 0.4s ease;
 }
+
 .eyes { display: flex; gap: 60px; }
+
 .eye {
     width: 100px; height: 100px;
     background-color: #00f7ff;
     border-radius: 50%;
-    transition: all 0.4s ease;
+    transition: all 0.25s ease;
+    animation: pulsar-olho 3s ease-in-out infinite;
+    color: #00f7ff; /* usado pelo pulsar-olho via currentColor */
 }
+
 .mouth {
     width: 150px; height: 8px;
     background-color: #00f7ff;
@@ -62,37 +112,44 @@ body {
     transition: all 0.4s ease;
 }
 
-/* ── ANIMAÇÃO DE FALA ───────────────────────────────────── */
-@keyframes talking {
-    0%, 100% { transform: scaleY(1); }
-    50%       { transform: scaleY(3); }
+/* ── FALA ───────────────────────────────────────────────── */
+.is-talking {
+    animation: talking 0.35s ease-in-out infinite;
+    transition: none;
 }
-.is-talking { animation: talking 0.2s infinite; }
 
-/* ── EMOÇÃO: NEUTRO (padrão) ───────────────────────────── */
-.neutro .eye  { background-color: #00f7ff; border-radius: 50%; }
-.neutro .mouth { background-color: #00f7ff; border-radius: 10px; }
+/* ── NEUTRO ─────────────────────────────────────────────── */
+.neutro { filter: drop-shadow(0 0 15px #00f7ff); }
+.neutro .eye  { background-color: #00f7ff; color: #00f7ff; }
+.neutro .mouth { background-color: #00f7ff; }
 
-/* ── EMOÇÃO: FELIZ ─────────────────────────────────────── */
-.feliz { filter: drop-shadow(0 0 20px #00ff88); }
+/* ── FELIZ ───────────────────────────────────────────────── */
+.feliz {
+    filter: drop-shadow(0 0 20px #00ff88);
+    animation: flutuar 4s ease-in-out infinite, saltitar 0.6s ease-in-out 2;
+}
 .feliz .eye {
     height: 20px; border-radius: 100px 100px 0 0;
     background: transparent; border: 6px solid #00ff88;
+    color: #00ff88; animation: pulsar-olho 1.5s ease-in-out infinite;
 }
 .feliz .mouth {
     width: 140px; height: 40px;
     border-radius: 0 0 100px 100px;
-    border: 6px solid #00ff88;
-    border-top: none;
+    border: 6px solid #00ff88; border-top: none;
     background: transparent;
 }
 
-/* ── EMOÇÃO: BRAVO ─────────────────────────────────────── */
-.bravo { filter: drop-shadow(0 0 20px #ff3300); }
+/* ── BRAVO ───────────────────────────────────────────────── */
+.bravo {
+    filter: drop-shadow(0 0 20px #ff3300);
+    animation: flutuar 4s ease-in-out infinite, vibrar 0.12s linear infinite;
+}
 .bravo .eye {
     background-color: #ff3300;
     clip-path: polygon(50% 30%, 0% 100%, 100% 100%);
     border-radius: 0;
+    color: #ff3300; animation: pulsar-olho 0.6s ease-in-out infinite;
 }
 .bravo .mouth {
     width: 120px; height: 8px;
@@ -101,36 +158,38 @@ body {
     transform: scaleY(-1);
 }
 
-/* ── EMOÇÃO: SURPRESO ──────────────────────────────────── */
-.surpreso { filter: drop-shadow(0 0 25px #ffee00); }
+/* ── SURPRESO ────────────────────────────────────────────── */
+.surpreso {
+    filter: drop-shadow(0 0 25px #ffee00);
+    animation: flutuar 4s ease-in-out infinite, susto 0.4s ease-in-out 3;
+}
 .surpreso .eye {
     width: 110px; height: 110px;
     background-color: #ffee00;
     border-radius: 50%;
+    color: #ffee00; animation: pulsar-olho 0.5s ease-in-out infinite;
 }
 .surpreso .mouth {
     width: 70px; height: 70px;
     background: transparent;
-    border: 6px solid #ffee00;
-    border-radius: 50%;
+    border: 6px solid #ffee00; border-radius: 50%;
 }
 
-/* ── EMOÇÃO: TRISTE ─────────────────────────────────────── */
+/* ── TRISTE ──────────────────────────────────────────────── */
 .triste { filter: drop-shadow(0 0 15px #8888ff); }
 .triste .eye {
     background-color: #8888ff;
-    border-radius: 50%;
-    height: 70px;
+    border-radius: 50%; height: 70px;
+    color: #8888ff; animation: pulsar-olho 4s ease-in-out infinite;
 }
 .triste .mouth {
     width: 100px; height: 30px;
     border-radius: 100px 100px 0 0;
-    border: 6px solid #8888ff;
-    border-bottom: none;
+    border: 6px solid #8888ff; border-bottom: none;
     background: transparent;
 }
 
-/* ── HUD ────────────────────────────────────────────────── */
+/* ── HUD ─────────────────────────────────────────────────── */
 .hud {
     position: fixed; bottom: 30px;
     display: flex; gap: 10px; align-items: center;
@@ -143,7 +202,6 @@ body {
     font-size: 1rem;
 }
 #inputTexto::placeholder { color: #555; }
-
 .hud button {
     background: #00f7ff; border: none;
     width: 44px; height: 44px;
@@ -154,7 +212,7 @@ body {
 .hud button:hover  { background: #00c8d4; }
 .hud button:active { background: #009aaa; }
 
-/* ── BOTÃO FULLSCREEN ──────────────────────────────────── */
+/* ── BOTÃO FULLSCREEN ───────────────────────────────────── */
 #btnFullscreen {
     position: fixed; top: 16px; right: 16px;
     background: transparent;
@@ -162,7 +220,6 @@ body {
     color: #00f7ff; font-size: 1.2rem;
     width: 40px; height: 40px;
     border-radius: 8px; cursor: pointer;
-    z-index: 10;
-    transition: background 0.2s;
+    z-index: 10; transition: background 0.2s;
 }
 #btnFullscreen:hover { background: #00f7ff22; }
