@@ -6,7 +6,7 @@ const looiMouth = document.getElementById('looi-mouth');
 const input     = document.getElementById('inputTexto');
 
 // ⚠️ COLOQUE AQUI O SEU LINK DO LOCALTUNNEL (ex: https://xxx.loca.lt)
-const URL_TUNEL = "https://looi-robot.loca.lt";
+const URL_TUNEL = "https://SEU-LINK-AQUI.loca.lt";
 
 const HEADERS_TUNNEL = { 'bypass-tunnel-reminder': 'true' };
 
@@ -210,6 +210,7 @@ if (Reconhecimento) {
         console.log("Ouvi:", transcricao);
         input.value = transcricao;
         comunicar(transcricao);
+        setTimeout(() => { input.value = ""; }, 800); // mostra 0.8s e limpa
     };
 
     ouvinte.onend = () => {
