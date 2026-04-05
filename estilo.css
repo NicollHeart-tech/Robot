@@ -1,135 +1,70 @@
-:root {
-    --neon: #00f7ff;
-    --danger: #ff3300;
-    --bg: #000000;
-}
+:root { --neon: #00f7ff; --bg: #000; }
 
-body {
-    background-color: var(--bg);
-    margin: 0;
-    height: 100vh;
+body { background: var(--bg); color: white; font-family: 'Orbitron', sans-serif; overflow: hidden; margin: 0; }
+
+/* --- NOVA BOCA ESTILO EQUALIZADOR --- */
+.mouth-container {
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-family: 'Orbitron', sans-serif;
-    color: white;
-    overflow: hidden;
+    gap: 8px;
+    height: 40px;
 }
-
-/* --- TELA DE LOGIN --- */
-#tela-login {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, #0a0a0a, #000);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.glass-box {
-    padding: 40px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--neon);
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 0 20px var(--neon);
-}
-.neon-text { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-input { background: transparent; border: 1px solid var(--neon); color: white; padding: 10px; border-radius: 5px; outline: none; }
-.btn-glow { background: var(--neon); color: black; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-
-/* --- HUD LATERAL --- */
-.hud-lateral {
-    position: fixed;
-    left: 20px;
-    top: 20px;
-    background: rgba(0, 247, 255, 0.05);
-    padding: 15px;
-    border-radius: 10px;
-    border-left: 2px solid var(--neon);
-    font-size: 10px;
-}
-.bar { width: 100px; height: 3px; background: #222; margin-top: 5px; margin-bottom: 10px; }
-.fill { height: 100%; background: var(--neon); width: 50%; transition: 0.5s; }
-
-/* --- O ROSTO --- */
-.face-wrapper {
-    cursor: pointer;
-    animation: floating 3s infinite ease-in-out;
-}
-@keyframes floating {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-}
-
-.eyes { display: flex; gap: 60px; margin-bottom: 40px; }
-.eye {
-    width: 90px;
-    height: 90px;
+.mouth-bar {
+    width: 10px;
+    height: 8px;
     background: var(--neon);
-    border-radius: 50%;
-    box-shadow: 0 0 30px var(--neon);
-    position: relative;
-    animation: blink 4s infinite;
-}
-@keyframes blink {
-    0%, 96%, 100% { transform: scaleY(1); }
-    98% { transform: scaleY(0.05); }
-}
-
-/* BOCA OVAL NEON */
-.mouth {
-    width: 70px;
-    height: 20px;
-    border: 5px solid var(--neon);
-    border-radius: 50%;
-    margin: 0 auto;
+    border-radius: 5px;
+    box-shadow: 0 0 10px var(--neon);
     transition: 0.2s;
 }
-.is-talking { animation: talking 0.15s infinite alternate; }
-@keyframes talking {
-    from { transform: scaleY(1); }
-    to { transform: scaleY(3.5); }
+/* Animação de fala: as barras sobem e descem em tempos diferentes */
+.is-talking .bar1 { animation: wave 0.3s infinite alternate; }
+.is-talking .bar2 { animation: wave 0.4s infinite alternate; }
+.is-talking .bar3 { animation: wave 0.35s infinite alternate; }
+
+@keyframes wave {
+    from { height: 8px; }
+    to { height: 40px; }
 }
 
-/* --- ESTADOS DE EMOÇÃO --- */
-.feliz .eye { height: 40px; border-radius: 100px 100px 0 0; background: transparent; border: 8px solid var(--neon); }
-.bravo .eye { background: var(--danger); box-shadow: 0 0 30px var(--danger); clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); }
-.bravo .mouth { border-color: var(--danger); height: 5px; border-radius: 0; }
-.surpreso .eye { width: 110px; height: 110px; }
-
-/* --- MODO TELA CHEIA (FULLSCREEN) --- */
-:fullscreen .hud-lateral, 
-:fullscreen .bottom-interface, 
-:fullscreen .config-popup { display: none !important; }
-:fullscreen .face-wrapper { scale: 1.6; }
-
-/* --- BARRA DE CHAT --- */
-.bottom-interface { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; }
-.chat-container {
-    background: rgba(255,255,255,0.05);
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: 1px solid var(--neon);
-    display: flex;
-    align-items: center;
-    width: 450px;
-}
-#inputTexto { background: transparent; border: none; color: white; flex: 1; outline: none; }
-.btns-group button { background: transparent; border: none; color: var(--neon); font-size: 20px; cursor: pointer; margin-left: 10px; transition: 0.2s; }
-.btns-group button:hover { transform: scale(1.2); }
-
-/* POPUP CONFIG */
-.config-popup {
-    display: none;
+/* --- MICROFONE TELA CHEIA --- */
+#mic-fullscreen {
+    display: none; /* Escondido por padrão */
     position: fixed;
-    top: 50%;
+    bottom: 40px;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: #111;
+    transform: translateX(-50%);
+    background: rgba(0, 247, 255, 0.2);
     border: 2px solid var(--neon);
-    padding: 30px;
-    border-radius: 15px;
-    z-index: 2000;
+    color: var(--neon);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 0 20px var(--neon);
 }
+
+/* Mostrar mic apenas em tela cheia */
+:fullscreen #mic-fullscreen {
+    display: block;
+}
+
+/* Esconder interface padrão em tela cheia */
+:fullscreen .bottom-interface, :fullscreen .hud-lateral {
+    display: none !important;
+}
+
+/* Ajustes de Olhos e Emoções */
+.face { transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 40px; }
+.eyes { display: flex; gap: 60px; }
+.eye { width: 80px; height: 80px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 20px var(--neon); }
+.bravo .eye { background: #ff3300; clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); }
+
+/* Resto dos estilos (Login, HUD, Chat) */
+#tela-login { position: fixed; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 100; }
+.glass-box { border: 1px solid var(--neon); padding: 30px; border-radius: 15px; text-align: center; }
+.btn-glow { background: var(--neon); border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+.chat-container { display: flex; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 30px; border: 1px solid var(--neon); }
+.bottom-interface { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: center; }
