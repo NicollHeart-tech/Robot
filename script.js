@@ -6,7 +6,7 @@ const looiMouth = document.getElementById('looi-mouth');
 const input     = document.getElementById('inputTexto');
 
 // ⚠️ COLOQUE AQUI O SEU LINK DO LOCALTUNNEL (ex: https://xxx.loca.lt)
-const URL_TUNEL = "https://SEU-LINK-AQUI.loca.lt";
+const URL_TUNEL = "https://looi-robot.loca.lt";
 
 // Header obrigatório para o LocalTunnel não bloquear as requisições
 const HEADERS_TUNNEL = { 'bypass-tunnel-reminder': 'true' };
