@@ -1,70 +1,85 @@
 let URL_SERV = localStorage.getItem('looi_url') || "https://looi-robot.loca.lt";
 let ocupada = false;
+let textoCapturado = ""; // Armazena o que a IA ouviu
 
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
         document.getElementById('tela-login').style.display = "none";
         document.getElementById('conteudo-robo').style.display = "flex";
-        iniciarCam();
+        iniciarHardware();
     }
 }
 
-function iniciarCam() {
+function iniciarHardware() {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(s => {
         document.getElementById('video').srcObject = s;
     });
-    roboFalar("Sistemas de nuvem ativos. Olá, Nicollas!");
+    roboFalar("Modo Imersivo ativo. Estou pronta.");
 }
 
-// FUNÇÃO DE TELA CHEIA (ATIVAR/DESATIVAR)
 function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
 }
 
-// --- SISTEMA DE VOZ ---
+// --- SISTEMA DE VOZ COM CONFIRMAÇÃO ---
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
 const ouvinte = Rec ? new Rec() : null;
 
 if (ouvinte) {
     ouvinte.lang = 'pt-BR';
-    // Quando você começa a falar, a LOOI brilha mais forte (feedback visual)
-    ouvinte.onstart = () => { document.body.style.boxShadow = "inset 0 0 50px #00f7ff"; };
-    ouvinte.onend = () => { document.body.style.boxShadow = "none"; };
-    
+    ouvinte.continuous = false; 
+
+    ouvinte.onstart = () => {
+        document.body.style.boxShadow = "inset 0 0 60px var(--neon)";
+        console.log("Ouvindo...");
+    };
+
     ouvinte.onresult = (e) => {
-        const transcricao = e.results[0][0].transcript;
-        comunicar(transcricao);
+        textoCapturado = e.results[0][0].transcript;
+        document.getElementById('inputTexto').value = textoCapturado; // Mostra o texto na barra
+        
+        // MOSTRA OS BOTÕES DE CONFIRMAÇÃO
+        document.getElementById('btnConfirmar').style.display = "block";
+        document.getElementById('confirmar-voz-fs').style.display = "block";
+        
+        console.log("Detectado: " + textoCapturado);
+    };
+
+    ouvinte.onend = () => {
+        document.body.style.boxShadow = "none";
     };
 }
 
 function ativarVoz() {
-    // Só funciona se suportado, não estiver ocupada e tiver permissão
-    if (ouvinte && !ocupada) ouvinte.start();
+    if (ouvinte && !ocupada) {
+        textoCapturado = "";
+        ouvinte.start();
+    }
+}
+
+// FUNÇÃO QUE REALMENTE ENVIA PARA O PYTHON
+function confirmarEnvio() {
+    if (textoCapturado !== "") {
+        comunicar(textoCapturado);
+        // Esconde os botões após enviar
+        document.getElementById('btnConfirmar').style.display = "none";
+        document.getElementById('confirmar-voz-fs').style.display = "none";
+        textoCapturado = "";
+    }
 }
 
 function roboFalar(texto) {
     window.speechSynthesis.cancel();
-    const fala = new SpeechSynthesisUtterance(texto);
-    fala.lang = 'pt-BR';
-    fala.onstart = () => {
-        ocupada = true;
-        document.getElementById('looi-face').classList.add('is-talking');
-    };
-    fala.onend = () => {
-        document.getElementById('looi-face').classList.remove('is-talking');
-        ocupada = false;
-    };
-    window.speechSynthesis.speak(fala);
+    const f = new SpeechSynthesisUtterance(texto);
+    f.lang = 'pt-BR';
+    f.onstart = () => { ocupada = true; document.getElementById('looi-face').classList.add('is-talking'); };
+    f.onend = () => { ocupada = false; document.getElementById('looi-face').classList.remove('is-talking'); };
+    window.speechSynthesis.speak(f);
 }
 
 function comunicar(texto) {
     if (!texto || ocupada) return;
-    inputTexto.value = "";
-    
     const canv = document.getElementById('canvas');
     const vid = document.getElementById('video');
     canv.width = 400; canv.height = 300;
@@ -75,28 +90,17 @@ function comunicar(texto) {
         fd.append('texto', texto);
         fd.append('imagem', blob);
 
-        // Comunica com o cérebro cloud
-        fetch(`${URL_SERV}/interagir`, {
-            method: 'POST',
-            body: fd,
-            headers: { "Bypass-Tunnel-Reminder": "true" } // Pula a página de aviso do LocalTunnel
-        })
-        .then(r => r.json())
-        .then(dados => {
-            document.getElementById('looi-face').className = 'face ' + dados.emocao.toLowerCase();
-            roboFalar(dados.resposta);
+        fetch(`${URL_SERV}/interagir`, { method: 'POST', body: fd, headers: {"Bypass-Tunnel-Reminder": "true"} })
+        .then(r => r.json()).then(d => {
+            document.getElementById('looi-face').className = 'face ' + d.emocao.toLowerCase();
+            roboFalar(d.resposta);
         });
     }, 'image/jpeg');
 }
 
-// Botões normais
-document.getElementById('btnEnviar').onclick = () => {
-    const val = document.getElementById('inputTexto').value;
-    comunicar(val);
-    document.getElementById('inputTexto').value = "";
-};
+// Eventos de botões
+document.getElementById('btnEnviar').onclick = () => comunicar(document.getElementById('inputTexto').value);
 
-// Menu e Config
 function toggleMenu() {
     const m = document.getElementById('menu-config');
     m.style.display = m.style.display === "block" ? "none" : "block";
