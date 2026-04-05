@@ -3,34 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS - Online</title>
+    <title>LOOI OS - Moondream Edition</title>
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
     <div id="tela-login">
         <div class="login-box">
-            <h1 class="titulo-seguranca">SISTEMA PROTEGIDO</h1>
-            <p>Chave de Acesso:</p>
+            <h1 style="color:#00f7ff; letter-spacing:5px;">LOOI OS</h1>
+            <p style="color:white">Insere a Chave de Acesso</p>
             <input type="password" id="senhaInput" placeholder="******">
-            <button onclick="verificarSenha()" id="btnAcessar">DESBLOQUEAR</button>
-            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">SENHA INCORRETA!</p>
+            <button onclick="verificarSenha()">ENTRAR</button>
+            <p id="erroMsg" style="display:none; color:red;">SENHA INCORRETA</p>
         </div>
     </div>
 
-    <div id="conteudo-robo" style="display:none;">
-        <div class="rosto-main-container">
-            <div id="looi-face" class="face neutral">
-                <div class="eyes">
-                    <div class="eye left"></div>
-                    <div class="eye right"></div>
-                </div>
-                <div class="mouth" id="looi-mouth"></div>
+    <div id="conteudo-robo" style="display:none; flex-direction:column; align-items:center;">
+        <div class="face neutral" id="looi-face">
+            <div class="eyes">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
             </div>
+            <div class="mouth" id="looi-mouth"></div>
         </div>
 
         <div class="hud">
-            <input type="text" id="inputTexto" placeholder="Escreva algo...">
+            <input type="text" id="inputTexto" placeholder="Conversar...">
             <button id="btnEnviar">➤</button>
             <button id="btnVoz">🎤</button>
         </div>
