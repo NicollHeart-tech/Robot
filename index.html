@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS ULTRA - v3.0</title>
+    <title>LOOI OS ULTRA - v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilo.css">
 </head>
@@ -12,28 +12,18 @@
     <div id="tela-login">
         <div class="glass-box">
             <h1 class="neon-text">LOOI CORE</h1>
-            <p>SISTEMA DE SEGURANÇA ATIVO</p>
             <input type="password" id="senhaInput" placeholder="Chave de Acesso">
             <button onclick="verificarSenha()" class="btn-glow">AUTENTICAR</button>
-            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">ACESSO NEGADO!</p>
         </div>
     </div>
 
     <div id="conteudo-robo" style="display:none;">
         
+        <button id="mic-fullscreen" onclick="ativarVoz()">🎤</button>
+
         <div class="hud-lateral">
-            <div class="stat-item">
-                <span>CPU PROCESS</span>
-                <div class="bar"><div id="cpu-bar" class="fill"></div></div>
-            </div>
-            <div class="stat-item">
-                <span>NEURAL LINK</span>
-                <div class="bar"><div id="mem-bar" class="fill"></div></div>
-            </div>
-            <div class="stat-item">
-                <span class="label">MOOD:</span>
-                <span id="status-mood" class="neon-blue">STABLE</span>
-            </div>
+            <div class="stat-item">CPU <div class="bar"><div id="cpu-bar" class="fill"></div></div></div>
+            <div class="stat-item">MEM <div class="bar"><div id="mem-bar" class="fill"></div></div></div>
         </div>
 
         <div class="face-wrapper" id="pet-area">
@@ -42,30 +32,30 @@
                     <div class="eye left"><div class="pupil"></div></div>
                     <div class="eye right"><div class="pupil"></div></div>
                 </div>
-                <div class="mouth-box">
-                    <div class="mouth" id="looi-mouth"></div>
+                <div class="mouth-container">
+                    <div class="mouth-bar bar1"></div>
+                    <div class="mouth-bar bar2"></div>
+                    <div class="mouth-bar bar3"></div>
                 </div>
             </div>
         </div>
 
         <div class="bottom-interface">
             <div class="chat-container">
-                <input type="text" id="inputTexto" placeholder="Escreva ou use o microfone...">
+                <input type="text" id="inputTexto" placeholder="Diga algo...">
                 <div class="btns-group">
-                    <button id="btnEnviar" title="Enviar">➤</button>
-                    <button id="btnVoz" title="Falar">🎤</button>
-                    <button id="btnFullscreen" onclick="toggleFullScreen()" title="Tela Cheia">📺</button>
-                    <button id="btnConfig" onclick="toggleMenu()" title="Configurações">⚙️</button>
+                    <button id="btnEnviar">➤</button>
+                    <button onclick="ativarVoz()">🎤</button>
+                    <button onclick="toggleFullScreen()">📺</button>
+                    <button onclick="toggleMenu()">⚙️</button>
                 </div>
             </div>
         </div>
 
         <div id="menu-config" class="config-popup">
-            <h3>PAINEL DE CONTROLE</h3>
-            <p>URL do Servidor (LocalTunnel):</p>
-            <input type="text" id="configUrl" placeholder="https://exemplo.loca.lt">
-            <button onclick="salvarConfig()" class="btn-save">ATUALIZAR LINK</button>
-            <button onclick="toggleMenu()" class="btn-close">FECHAR</button>
+            <h3>CONFIGURAÇÕES</h3>
+            <input type="text" id="configUrl" placeholder="Link do LocalTunnel">
+            <button onclick="salvarConfig()" class="btn-save">SALVAR</button>
         </div>
     </div>
 
