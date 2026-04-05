@@ -6,7 +6,7 @@ const looiMouth = document.getElementById('looi-mouth');
 const input = document.getElementById('inputTexto');
 
 // COLOQUE AQUI O SEU LINK DO CLOUDFLARE/PINGGY
-const URL_TUNEL = "http://localhost:5000";
+const URL_TUNEL = "https://looi-robot.loca.lt";
 
 function verificarSenha() {
     const senha = document.getElementById('senhaInput').value;
