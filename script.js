@@ -1,24 +1,19 @@
-// Ligar a "torneira de dados" do Socket.IO para o teu LocalTunnel
 const socket = io("https://looi-robot.loca.lt", {
     extraHeaders: { "Bypass-Tunnel-Reminder": "true" }
 });
 
 let ocupada = false;
-let textoVoz = "";
-
+let ouvindoManual = true; // Controla se o mic deve estar ligado
 const looiFace = document.getElementById('looi-face');
 const input = document.getElementById('inputTexto');
 const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
 
-// 1. LOGIN E HARDWARE
+// 1. LOGIN
 function verificarSenha() {
     if (document.getElementById('senhaInput').value === "233442") {
         document.getElementById('tela-login').style.display = "none";
         document.getElementById('conteudo-robo').style.display = "flex";
         iniciarSistemas();
-    } else {
-        document.getElementById('erroMsg').style.display = "block";
     }
 }
 
@@ -26,66 +21,60 @@ function iniciarSistemas() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: true })
         .then(s => {
             video.srcObject = s;
-            iniciarVisaoLive(); // Inicia o streaming de vídeo
+            iniciarVisaoLive();
+            iniciarOuvinteContinuo(); // LIGA O MICROFONE SOZINHO
         });
-    roboFalar("Sistemas Live VLM ativos. Estou a ver tudo!");
+    roboFalar("Sistemas online. Estou ouvindo você, Nicollas.");
 }
 
-// 2. VISÃO CONTÍNUA (LIVE VLM)
+// 2. VISÃO LIVE VLM
 function iniciarVisaoLive() {
     setInterval(() => {
-        // Envia frames para o Python a cada 1 segundo em baixa resolução
-        if (!ocupada && video.videoWidth > 0 && document.getElementById('conteudo-robo').style.display !== "none") {
-            // Tira uma foto pequena (160px) para ser ultra fluido
+        if (!ocupada && video.videoWidth > 0) {
+            const canvas = document.getElementById('canvas');
             canvas.width = 160; canvas.height = 120;
             canvas.getContext('2d').drawImage(video, 0, 0, 160, 120);
-            
-            const frameData = canvas.toDataURL('image/jpeg', 0.5); // Qualidade 0.5 para não lagar o túnel
-            socket.emit('stream_frame', frameData); // Envia pelo túnel aberto
+            socket.emit('stream_frame', canvas.toDataURL('image/jpeg', 0.5));
         }
-    }, 1000); // 1 frame por segundo é o ideal para o LocalTunnel aguentar
+    }, 1000);
 }
 
-function toggleFullScreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else document.exitFullscreen();
-}
-
-// 3. VOZ COM CONFIRMAÇÃO
+// 3. OUVIDO BIÔNICO (Sempre Ativo)
 const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-const ouvinte = Rec ? new Rec() : null;
+const ouvinte = new Rec();
+ouvinte.lang = 'pt-BR';
+ouvinte.continuous = true; // NÃO PARA DE OUVIR
+ouvinte.interimResults = true; // MOSTRA O TEXTO ENQUANTO VOCÊ FALA
 
-if (ouvinte) {
-    ouvinte.lang = 'pt-BR';
-    ouvinte.onstart = () => { document.body.style.boxShadow = "inset 0 0 50px #00f7ff"; };
-    ouvinte.onend = () => { document.body.style.boxShadow = "none"; };
-    
-    ouvinte.onresult = (e) => {
-        textoVoz = e.results[0][0].transcript;
-        input.value = textoVoz;
-        // Mostra o botão de confirmar no meio da tela
-        document.getElementById('container-confirmar').style.display = "block";
-    };
-}
+ouvinte.onresult = (e) => {
+    if (ocupada) return; // Não processa se a IA estiver falando
 
-function ativarVoz() { if (ouvinte && !ocupada) { textoVoz = ""; ouvinte.start(); } }
-
-function confirmarEnvio() {
-    if (textoVoz !== "") {
-        // Em vez de usar fetch, envia pelo Socket
-        socket.emit('chat_live', textoVoz);
-        document.getElementById('container-confirmar').style.display = "none";
+    let textoFinal = "";
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+        if (e.results[i].isFinal) {
+            textoFinal = e.results[i][0].transcript;
+        } else {
+            input.value = e.results[i][0].transcript; // Texto aparece na caixinha
+        }
     }
-}
 
-function enviarTexto() { 
-    if (input.value !== "") {
-        socket.emit('chat_live', input.value);
-        input.value = ""; 
+    if (textoFinal !== "") {
+        input.value = textoFinal;
+        socket.emit('chat_live', textoFinal); // Envia automaticamente
     }
+};
+
+// Reinicia o mic se o navegador tentar desligar
+ouvinte.onend = () => {
+    if (!ocupada && ouvindoManual) ouvinte.start();
+};
+
+function iniciarOuvinteContinuo() {
+    ouvindoManual = true;
+    try { ouvinte.start(); } catch(e) {}
 }
 
-// 4. RECEBER RESPOSTAS DO PYTHON E FALAR
+// 4. RESPOSTA E TRAVA DE VOZ
 socket.on('ai_answer', (dados) => {
     looiFace.className = 'face ' + dados.emocao.toLowerCase();
     roboFalar(dados.resposta);
@@ -95,7 +84,23 @@ function roboFalar(texto) {
     window.speechSynthesis.cancel();
     const f = new SpeechSynthesisUtterance(texto);
     f.lang = 'pt-BR';
-    f.onstart = () => { ocupada = true; looiFace.classList.add('is-talking'); };
-    f.onend = () => { looiFace.classList.remove('is-talking'); ocupada = false; };
+
+    f.onstart = () => {
+        ocupada = true; // TRAVA O OUVIDO
+        ouvinte.stop(); // DESLIGA O MIC PARA NÃO OUVIR A SI MESMA
+        looiFace.classList.add('is-talking');
+    };
+
+    f.onend = () => {
+        looiFace.classList.remove('is-talking');
+        ocupada = false; // LIBERA O OUVIDO
+        setTimeout(() => { if(ouvindoManual) ouvinte.start(); }, 500); // VOLTA A OUVIR
+    };
+
     window.speechSynthesis.speak(f);
+}
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
 }
