@@ -1,78 +1,74 @@
-:root { --neon: #00f7ff; --bg: #000; --confirm: #00ff88; }
+:root { --neon: #00f7ff; --confirm: #00ff88; }
 
 body { 
-    background: var(--bg); 
-    color: #fff; 
-    font-family: 'Orbitron', sans-serif; 
-    margin: 0; 
-    overflow: hidden; 
-    width: 100vw; 
+    background: #000; color: #fff; font-family: 'Orbitron', sans-serif; 
+    margin: 0; overflow: hidden; height: 100vh; width: 100vw;
+}
+
+/* --- CENTRALIZAÇÃO DO ROSTO --- */
+.main-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
+    width: 100vw;
 }
 
-/* --- AJUSTE DO BOTÃO DE CONFIRMAÇÃO (RESOLVIDO) --- */
-#container-confirmar {
-    position: fixed;
-    top: 50%; /* Centraliza na tela para você não perder de vista */
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 9999; /* Fica acima de TUDO */
-    display: none;
-}
+.face { display: flex; flex-direction: column; align-items: center; gap: 40px; }
+.eyes { display: flex; gap: 50px; }
+.eye { width: 80px; height: 80px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 20px var(--neon); }
 
-#confirmar-voz-fs {
-    background: #000;
-    border: 3px solid var(--confirm);
-    color: var(--confirm);
-    padding: 20px 40px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 50px;
-    cursor: pointer;
-    box-shadow: 0 0 30px var(--confirm);
-    font-family: 'Orbitron';
-}
-
-/* --- DESIGN PARA CELULAR (RESPONSIVIDADE) --- */
-@media (max-width: 600px) {
-    .face { scale: 0.7; } /* Diminui o rosto para caber na tela pequena */
-    .chat-container { width: 85% !important; }
-    .hud-lateral { display: none; } /* Esconde o HUD no celular para não poluir */
-    
-    /* Botões de tela cheia maiores para o dedo */
-    #mic-fullscreen { width: 70px !important; height: 70px !important; bottom: 20px !important; right: 20px !important; }
-    #exit-fullscreen-btn { width: 60px !important; height: 60px !important; top: 20px !important; right: 20px !important; }
-}
-
-/* --- BOCA EQUALIZADOR --- */
-.mouth-container { display: flex; gap: 8px; height: 35px; align-items: center; }
-.m-bar { width: 10px; height: 8px; background: var(--neon); border-radius: 5px; box-shadow: 0 0 10px var(--neon); transition: 0.2s; }
+/* BOCA EQUALIZADOR */
+.mouth-container { display: flex; gap: 8px; height: 30px; align-items: center; }
+.m-bar { width: 10px; height: 8px; background: var(--neon); border-radius: 5px; box-shadow: 0 0 10px var(--neon); }
 .is-talking .b1 { animation: wave 0.3s infinite alternate; }
-.is-talking .b2 { animation: wave 0.4s infinite alternate; animation-delay: 0.1s; }
-.is-talking .b3 { animation: wave 0.35s infinite alternate; animation-delay: 0.2s; }
-@keyframes wave { from { height: 8px; } to { height: 45px; } }
+.is-talking .b2 { animation: wave 0.4s infinite alternate; }
+.is-talking .b3 { animation: wave 0.35s infinite alternate; }
+@keyframes wave { from { height: 8px; } to { height: 40px; } }
 
-/* --- TELA CHEIA (CONFORME SEU DESIGN) --- */
+/* --- DESIGN DE TELA CHEIA (CONFORME SEU DESENHO) --- */
 :fullscreen #exit-fullscreen-btn, :fullscreen #mic-fullscreen { display: flex; }
-:fullscreen .bottom-interface { display: none !important; }
-:fullscreen #conteudo-robo { background: #000; }
+:fullscreen .bottom-interface, :fullscreen .hud-lateral { display: none !important; }
+:fullscreen .face { scale: 1.4; }
 
 #exit-fullscreen-btn {
-    display: none; position: fixed; top: 40px; right: 40px;
+    display: none; position: fixed; top: 30px; right: 30px;
     width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--neon);
-    background: transparent; color: var(--neon); justify-content: center; align-items: center; z-index: 1000;
+    background: transparent; color: var(--neon); font-size: 25px; cursor: pointer;
+    justify-content: center; align-items: center; z-index: 1000;
 }
 
 #mic-fullscreen {
-    display: none; position: fixed; bottom: 40px; right: 40px;
-    width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon);
-    background: rgba(0,247,255,0.1); color: var(--neon); font-size: 30px; justify-content: center; align-items: center; z-index: 1000;
+    display: none; position: fixed; bottom: 30px; right: 30px;
+    width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon);
+    background: rgba(0, 247, 255, 0.1); color: var(--neon); font-size: 35px;
+    justify-content: center; align-items: center; cursor: pointer; z-index: 1000;
 }
 
-/* --- OUTROS --- */
+/* --- BOTÃO DE ENVIAR (VOZ) --- */
+#area-confirmacao {
+    display: none; position: fixed; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); z-index: 9999;
+}
+#btn-confirmar-envio {
+    background: #000; border: 3px solid var(--confirm); color: var(--confirm);
+    padding: 20px 30px; border-radius: 50px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 0 30px var(--confirm); font-family: 'Orbitron';
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .face { scale: 0.8; }
+    .chat-container { width: 90% !important; }
+    #exit-fullscreen-btn { top: 15px; right: 15px; }
+    #mic-fullscreen { bottom: 15px; right: 15px; }
+}
+
+/* OUTROS */
 #tela-login { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; justify-content: center; align-items: center; }
-.glass-box { border: 1px solid var(--neon); padding: 30px; border-radius: 20px; text-align: center; }
-.chat-container { display: flex; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 30px; border: 1px solid var(--neon); width: 400px; }
+.glass-box { border: 1px solid var(--neon); padding: 30px; border-radius: 15px; text-align: center; }
 .bottom-interface { position: fixed; bottom: 20px; width: 100%; display: flex; justify-content: center; }
-.face { display: flex; flex-direction: column; align-items: center; gap: 40px; transition: 0.3s; }
-.eye { width: 80px; height: 80px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 20px var(--neon); }
+.chat-container { display: flex; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 30px; border: 1px solid var(--neon); width: 400px; }
+.hud-lateral { position: fixed; left: 15px; top: 15px; }
+.bar { width: 70px; height: 3px; background: #222; margin-top: 5px; }
+.fill { height: 100%; background: var(--neon); width: 60%; }
