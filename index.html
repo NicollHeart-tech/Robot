@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LOOI OS - Protegido</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+    <div id="tela-login">
+        <div class="login-box">
+            <h1 class="titulo-seguranca">SISTEMA BLOQUEADO</h1>
+            <p>Insira a chave de acesso</p>
+            <input type="password" id="senhaInput" placeholder="233442">
+            <button onclick="verificarSenha()" id="btnAcessar">DESBLOQUEAR</button>
+            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">CHAVE INCORRETA!</p>
+        </div>
+    </div>
+
+    <div id="conteudo-robo" style="display:none;">
+        <div class="rosto-main-container">
+            <div id="looi-face" class="face neutral">
+                <div class="eyes">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                </div>
+                <div class="mouth" id="looi-mouth"></div>
+            </div>
+        </div>
+
+        <div class="hud">
+            <input type="text" id="inputTexto" placeholder="Fale comigo...">
+            <button id="btnEnviar">➤</button>
+            <button id="btnVoz">🎤</button>
+        </div>
+    </div>
+
+    <video id="video" autoplay playsinline style="display:none"></video>
+    <canvas id="canvas" style="display:none"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
