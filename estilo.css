@@ -1,99 +1,58 @@
-:root { --neon: #00f7ff; --bg: #000; --danger: #ff3300; }
+:root { --neon: #00f7ff; --bg: #000; --confirm: #00ff88; }
 
-body {
-    background: var(--bg);
-    color: #fff;
-    font-family: 'Orbitron', sans-serif;
-    margin: 0;
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body { background: var(--bg); color: #fff; font-family: 'Orbitron', sans-serif; margin: 0; overflow: hidden; }
+
+/* --- BOTÃO CONFIRMAR TELA CHEIA --- */
+#confirmar-voz-fs {
+    display: none; /* Escondido até detectar voz */
+    position: fixed;
+    bottom: 140px; /* Acima do botão de mic */
+    right: 40px;
+    background: rgba(0, 255, 136, 0.2);
+    border: 2px solid var(--confirm);
+    color: var(--confirm);
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-family: 'Orbitron';
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--confirm);
+    z-index: 1001;
+    animation: pulseConfirm 1s infinite alternate;
 }
 
-/* --- BOCA ESTILO EQUALIZADOR --- */
+@keyframes pulseConfirm {
+    from { transform: scale(1); opacity: 0.8; }
+    to { transform: scale(1.1); opacity: 1; }
+}
+
+/* --- BOCA E ROSTO (Ajustados para o design) --- */
+.face { display: flex; flex-direction: column; align-items: center; gap: 50px; }
+.eye { width: 85px; height: 85px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 25px var(--neon); }
 .mouth-container { display: flex; gap: 8px; height: 35px; align-items: center; }
 .m-bar { width: 10px; height: 8px; background: var(--neon); border-radius: 5px; box-shadow: 0 0 10px var(--neon); transition: 0.2s; }
 
-/* Animação quando fala */
-.is-talking .b1 { animation: wave 0.3s infinite alternate; }
-.is-talking .b2 { animation: wave 0.4s infinite alternate; animation-delay: 0.1s; }
-.is-talking .b3 { animation: wave 0.35s infinite alternate; animation-delay: 0.2s; }
+/* --- DESIGN IMERSIVO --- */
+:fullscreen #exit-fullscreen-btn, :fullscreen #mic-fullscreen { display: flex; }
+:fullscreen .face { scale: 1.6; }
+:fullscreen .bottom-interface, :fullscreen .hud-lateral { display: none !important; }
 
-@keyframes wave { from { height: 8px; } to { height: 40px; } }
-
-/* --- FACE E OLHOS --- */
-.face { display: flex; flex-direction: column; align-items: center; gap: 50px; transition: 0.3s; }
-.eyes { display: flex; gap: 60px; }
-.eye { width: 85px; height: 85px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 25px var(--neon); }
-
-/* --- DESIGN IMERSIVO (TELA CHEIA) --- */
-/* Quando o site entra em modo Fullscreen, aplicamos o layout do usuário */
-:fullscreen #exit-fullscreen-btn, 
-:fullscreen #mic-fullscreen {
-    display: flex; /* Mostra os botões de imersão */
-}
-
-:fullscreen #conteudo-robo {
-    background: #000; /* Fundo totalmente preto */
-}
-
-:fullscreen .bottom-interface, 
-:fullscreen .hud-lateral, 
-:fullscreen .config-popup {
-    display: none !important; /* Esconde o resto */
-}
-
-:fullscreen .face {
-    scale: 1.6; /* Aumenta o rosto no centro */
-}
-
-/* Estilo do Botão Sair (Canto Superior Direito) */
 #exit-fullscreen-btn {
-    display: none; /* Escondido por padrão */
-    position: fixed;
-    top: 40px;
-    right: 40px;
-    width: 70px; height: 70px; border-radius: 50%;
-    background: rgba(0, 247, 255, 0.1); border: 3px solid var(--neon); color: var(--neon); font-size: 30px; 
-    justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 15px var(--neon);
-    transition: 0.3s; z-index: 1000;
+    display: none; position: fixed; top: 40px; right: 40px;
+    width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--neon);
+    background: transparent; color: var(--neon); font-size: 30px; cursor: pointer;
+    justify-content: center; align-items: center; z-index: 1000;
 }
 
-/* Estilo do Botão Microfone (Canto Inferior Direito) */
 #mic-fullscreen {
-    display: none; /* Escondido por padrão */
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    width: 80px; height: 80px; border-radius: 50%;
-    background: rgba(0, 247, 255, 0.2); border: 3px solid var(--neon); color: var(--neon); font-size: 35px; 
-    justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 20px var(--neon);
-    transition: 0.3s; z-index: 1000;
+    display: none; position: fixed; bottom: 40px; right: 40px;
+    width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--neon);
+    background: rgba(0,247,255,0.1); color: var(--neon); font-size: 35px; cursor: pointer;
+    justify-content: center; align-items: center; z-index: 1000;
 }
 
-/* Efeito de Hover nos botões imersivos */
-#exit-fullscreen-btn:hover, #mic-fullscreen:hover {
-    background: rgba(0, 247, 255, 0.3);
-    box-shadow: 0 0 25px var(--neon);
-    scale: 1.1;
-}
-
-/* --- ESTADOS DE EMOÇÃO --- */
-.feliz .eye { height: 30px; border-radius: 100px 100px 0 0; background: transparent; border: 8px solid var(--neon); }
-.bravo { filter: drop-shadow(0 0 20px var(--danger)); }
-.bravo .eye { background: var(--danger); box-shadow: 0 0 25px var(--danger); clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); }
-.bravo .m-bar { background: var(--danger); height: 4px; box-shadow: 0 0 10px var(--danger); border-radius: 0; }
-.surpreso .eye { width: 110px; height: 110px; }
-
-/* --- LOGIN E INTERFACE (NORMAL) --- */
-#tela-login { position: fixed; inset: 0; background: #000; display: flex; justify-content: center; align-items: center; z-index: 1000; }
+/* Resto do Layout (Chat, Login, etc) */
+#tela-login { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; justify-content: center; align-items: center; }
 .glass-box { border: 1px solid var(--neon); padding: 40px; border-radius: 20px; text-align: center; }
-.chat-container { display: flex; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 40px; border: 1px solid var(--neon); width: 400px; }
+.chat-container { display: flex; background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 40px; border: 1px solid var(--neon); width: 420px; }
 input { background: transparent; border: none; color: #fff; flex: 1; outline: none; }
-button { background: transparent; border: none; color: var(--neon); cursor: pointer; font-size: 20px; margin-left: 10px; }
-.hud-lateral { position: fixed; left: 20px; top: 20px; font-size: 10px; }
-.bar { width: 80px; height: 4px; background: #222; margin-top: 5px; }
-.fill { height: 100%; background: var(--neon); width: 50%; }
-.config-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--neon); padding: 30px; border-radius: 15px; z-index: 2000; }
+button { background: transparent; border: none; color: var(--neon); cursor: pointer; }
