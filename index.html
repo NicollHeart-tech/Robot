@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOOI OS - Protegido</title>
+    <title>LOOI OS - Online</title>
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
 
     <div id="tela-login">
         <div class="login-box">
-            <h1 class="titulo-seguranca">SISTEMA BLOQUEADO</h1>
-            <p>Insira a chave de acesso</p>
-            <input type="password" id="senhaInput" placeholder="233442">
+            <h1 class="titulo-seguranca">SISTEMA PROTEGIDO</h1>
+            <p>Chave de Acesso:</p>
+            <input type="password" id="senhaInput" placeholder="******">
             <button onclick="verificarSenha()" id="btnAcessar">DESBLOQUEAR</button>
-            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">CHAVE INCORRETA!</p>
+            <p id="erroMsg" style="display:none; color: #ff3300; margin-top: 10px;">SENHA INCORRETA!</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
         </div>
 
         <div class="hud">
-            <input type="text" id="inputTexto" placeholder="Fale comigo...">
+            <input type="text" id="inputTexto" placeholder="Escreva algo...">
             <button id="btnEnviar">➤</button>
             <button id="btnVoz">🎤</button>
         </div>
