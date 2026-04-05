@@ -62,8 +62,8 @@ function roboFalar(texto) {
 function capturarFrame() {
     return new Promise((resolve) => {
         if (videoEl.videoWidth > 0) {
-            canvas.width  = 320;
-            canvas.height = 240;
+            canvas.width  = 854;
+            canvas.height = 480;
             ctx.drawImage(videoEl, 0, 0, 320, 240);
             canvas.toBlob(resolve, 'image/jpeg');
         } else {
