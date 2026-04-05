@@ -1,103 +1,77 @@
-:root { --neon: #00f7ff; --bg: #000; }
+:root { --neon: #00f7ff; --bg: #000; --danger: #ff3300; --confirm: #00ff88; }
 
 body { 
-    background: var(--bg); 
-    color: #fff; 
-    margin: 0; 
-    padding: 0;
-    overflow: hidden; 
+    background-color: var(--bg); color: #fff; margin: 0; 
+    overflow: hidden; height: 100vh; width: 100vw;
     font-family: 'Orbitron', sans-serif;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
 }
 
-/* --- O ROSTO (FICA NO MEIO DO ESPAÇO LIVRE) --- */
-.main-display { 
-    flex: 1; /* Preenche todo o espaço possível da tela */
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
+/* CENTRALIZAÇÃO TOTAL DO ROSTO */
+.main-display {
+    display: flex; justify-content: center; align-items: center;
+    height: 100vh; width: 100vw;
 }
 
-.face { display: flex; flex-direction: column; align-items: center; gap: 40px; transition: 0.3s; }
-.eyes { display: flex; gap: 50px; }
+.face { display: flex; flex-direction: column; align-items: center; gap: 50px; transition: 0.3s; }
+.eyes { display: flex; gap: 60px; }
 .eye { width: 80px; height: 80px; background: var(--neon); border-radius: 50%; box-shadow: 0 0 20px var(--neon); }
 
-/* BOCA EQUALIZADOR */
-.mouth-container { display: flex; gap: 8px; height: 30px; align-items: center; }
-.m-bar { width: 10px; height: 8px; background: var(--neon); border-radius: 5px; box-shadow: 0 0 10px var(--neon); }
+/* BOCA ESTILO EQUALIZADOR */
+.mouth-container { display: flex; gap: 10px; height: 35px; align-items: center; }
+.m-bar { width: 12px; height: 10px; background: var(--neon); border-radius: 5px; box-shadow: 0 0 10px var(--neon); transition: 0.2s; }
+
+/* Animação de fala */
 .is-talking .b1 { animation: wave 0.3s infinite alternate; }
-.is-talking .b2 { animation: wave 0.4s infinite alternate; }
-.is-talking .b3 { animation: wave 0.35s infinite alternate; }
-@keyframes wave { from { height: 8px; } to { height: 45px; } }
+.is-talking .b2 { animation: wave 0.4s infinite alternate; animation-delay: 0.1s; }
+.is-talking .b3 { animation: wave 0.35s infinite alternate; animation-delay: 0.2s; }
+@keyframes wave { from { height: 10px; } to { height: 50px; } }
 
-/* --- A BARRA DE CHAT (CORRIGIDA PARA CELULAR) --- */
-.hud { 
-    width: 100%; 
-    padding-bottom: 30px; 
-    display: flex; 
-    justify-content: center; 
-}
-
-.chat-area { 
-    display: flex; 
-    align-items: center;
-    gap: 10px;
-    width: 90%; /* Adapta perfeitamente a qualquer celular */
-    max-width: 450px; /* Não fica gigante no PC */
-    background: rgba(255,255,255,0.05); 
-    padding: 10px 20px; 
-    border-radius: 40px; 
-    border: 1px solid var(--neon); 
-    box-sizing: border-box; /* Impede que a borda quebre o layout */
-}
-
-input { 
-    flex: 1; /* A caixa de texto usa todo o espaço que sobrar */
-    width: 100%;
-    background: transparent; 
-    border: none; 
-    color: var(--neon); 
-    outline: none; 
-    font-size: 16px; /* 16px evita que o celular dê zoom automático na tela */
-    font-family: sans-serif;
-}
-
-.chat-area button { 
-    background: transparent; 
-    border: none; 
-    color: var(--neon); 
-    font-size: 24px; 
-    cursor: pointer; 
-}
-
-/* --- DESIGN DE TELA CHEIA (O SEU DESENHO) --- */
-:fullscreen #exit-fullscreen-btn, :fullscreen #mic-status-icon { display: flex; }
+/* DESIGN DE TELA CHEIA (CONFORME DESENHO) */
+:fullscreen #exit-fullscreen-btn, :fullscreen #mic-fullscreen { display: flex; }
 :fullscreen .hud { display: none !important; }
 :fullscreen .face { scale: 1.5; }
 
 #exit-fullscreen-btn {
     display: none; position: fixed; top: 30px; right: 30px;
-    width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--neon);
-    background: transparent; color: var(--neon); justify-content: center; align-items: center; cursor: pointer;
-    font-size: 25px; z-index: 1000;
+    width: 65px; height: 65px; border-radius: 50%; border: 2px solid var(--neon);
+    background: transparent; color: var(--neon); font-size: 25px; cursor: pointer;
+    justify-content: center; align-items: center; z-index: 1000;
 }
 
-#mic-status-icon {
+#mic-fullscreen {
     display: none; position: fixed; bottom: 30px; right: 30px;
-    width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--neon);
-    background: rgba(0,247,255,0.1); color: var(--neon); font-size: 30px;
-    justify-content: center; align-items: center; box-shadow: 0 0 15px var(--neon);
+    width: 85px; height: 85px; border-radius: 50%; border: 3px solid var(--neon);
+    background: rgba(0, 247, 255, 0.1); color: var(--neon); font-size: 35px;
+    justify-content: center; align-items: center; cursor: pointer; z-index: 1000;
 }
 
-/* EMOÇÕES */
-.feliz .eye { height: 20px; border-radius: 100px 100px 0 0; background: transparent; border: 8px solid var(--neon); }
-.bravo .eye { background: #ff3300; clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); }
+/* BOTÃO DE CONFIRMAR VOZ */
+#container-confirmar {
+    display: none; position: fixed; top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); z-index: 9999;
+}
+#btn-confirmar-envio {
+    background: #000; border: 3px solid var(--confirm); color: var(--confirm);
+    padding: 20px 35px; border-radius: 50px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 0 30px var(--confirm); font-size: 18px;
+}
 
-/* LOGIN */
-#tela-login { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; }
+/* OUTROS ELEMENTOS (LOGIN E INTERFACE) */
+#tela-login { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; justify-content: center; align-items: center; }
 .login-box { border: 2px solid var(--neon); padding: 40px; border-radius: 20px; text-align: center; }
-#senhaInput { background: transparent; border: 1px solid var(--neon); color: white; padding: 10px; margin: 20px 0; border-radius: 5px; text-align: center; }
-#btnAcessar { background: var(--neon); color: black; font-weight: bold; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+.hud { position: fixed; bottom: 30px; width: 100%; display: flex; justify-content: center; }
+.chat-area { display: flex; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 40px; border: 1px solid var(--neon); }
+input { background: transparent; border: none; color: #fff; outline: none; padding: 10px; width: 250px; }
+button { background: var(--neon); border: none; color: #000; cursor: pointer; border-radius: 50%; font-weight: bold; }
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .face { scale: 0.8; }
+    .chat-area { width: 90% !important; }
+    #exit-fullscreen-btn { top: 15px; right: 15px; }
+    #mic-fullscreen { bottom: 15px; right: 15px; }
+}
+
+/* CLASSES DE EMOÇÃO */
+.feliz .eye { height: 25px; border-radius: 100px 100px 0 0; background: transparent; border: 8px solid var(--neon); }
+.bravo .eye { background: var(--danger); box-shadow: 0 0 25px var(--danger); clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%); }
